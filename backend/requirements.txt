@@ -1,0 +1,10 @@
+# BhoomiRakshak backend — pinned, lightweight (no torch: optical-flow Stage-1 baseline)
+fastapi==0.115.6
+uvicorn==0.34.0
+numpy>=1.26
+opencv-python-headless==4.10.0.84
+scikit-image
+shapely==2.0.6
+requests==2.31.0
+pydantic==2.10.4
+websockets==14.1
