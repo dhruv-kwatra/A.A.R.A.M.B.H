@@ -6,6 +6,7 @@ import { go } from '../../router.js';
 import { IconArrowRight } from '../icons.jsx';
 import Reveal from './Reveal.jsx';
 import HeroLeafletMap from './HeroLeafletMap.jsx';
+import LedTimer from '../LedTimer.jsx';
 
 const SEV = {
   yellow: { color: '#facc15', r: 5 },
@@ -225,6 +226,16 @@ export function Hero({ t, live }) {
     return latest;
   }, [cycles]);
 
+  const nextCycleInS = useMemo(() => {
+    let minNext = null;
+    Object.values(cycles).forEach((c) => {
+      if (typeof c?.next_cycle_in_s === 'number') {
+        if (minNext === null || c.next_cycle_in_s < minNext) minNext = c.next_cycle_in_s;
+      }
+    });
+    return minNext ?? 300;
+  }, [cycles]);
+
   return (
     <header className="hero">
       <div className="wrap">
@@ -267,6 +278,14 @@ export function Hero({ t, live }) {
             <div className="hero-hud">
               <span className="hud-region">{t.allIndia}</span>
               <span>{t.lastCycle}: {formatIST(lastCycle)}</span>
+            </div>
+            <div className="hero-hud-timer">
+              <LedTimer
+                nextInSeconds={nextCycleInS}
+                onRefresh={live.refresh}
+                size="sm"
+                label="CYCLE UPDATE"
+              />
             </div>
             <HeroLeafletMap regions={regions} worstSev={stats.worst} />
             <div className="hero-foot">

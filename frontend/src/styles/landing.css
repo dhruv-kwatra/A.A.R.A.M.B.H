@@ -286,6 +286,21 @@
 }
 .hero-hud .hud-region { font-weight: 700; color: var(--br-text); letter-spacing: 0.6px; }
 
+.hero-hud-timer {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 500;
+  pointer-events: auto;
+}
+
+@media (max-width: 640px) {
+  .hero-hud-timer {
+    top: 56px;
+    right: 16px;
+  }
+}
+
 .hero-foot {
   position: relative; z-index: 500;
   display: flex; justify-content: center; gap: var(--sp-6);

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Logo } from '../components/icons.jsx';
 import { go } from '../router.js';
+import LedTimer from '../components/LedTimer.jsx';
 import {
   fetchLayers,
   fetchRedZones,
@@ -257,6 +258,12 @@ export default function RelocationDashboard({ lang = 'en', onLang, theme = 'dark
 
         {/* Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <LedTimer
+            nextInSeconds={300}
+            onRefresh={handleCompute}
+            size="sm"
+            label="CYCLE CADENCE"
+          />
           {onToggleTheme && (
             <button
               className="theme-toggle-btn"

@@ -263,6 +263,10 @@ export default function Dashboard({ lang, onLang, theme = 'dark', onToggleTheme 
         t={t}
         theme={theme}
         onToggleTheme={onToggleTheme}
+        onRefresh={() => {
+          const s = stateRef.current;
+          loadAll(s.regionId, s.leadMin);
+        }}
       />
 
       {!online && !initialLoading && (

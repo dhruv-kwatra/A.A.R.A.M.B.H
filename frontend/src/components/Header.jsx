@@ -3,6 +3,7 @@ import { regionName } from '../utils/i18n.js';
 import { Logo, IconArrowLeft } from './icons.jsx';
 import { useISTClock } from '../hooks/useLive.js';
 import { go } from '../router.js';
+import LedTimer from './LedTimer.jsx';
 
 export default function Header({
   online,
@@ -17,6 +18,7 @@ export default function Header({
   t,
   theme = 'dark',
   onToggleTheme,
+  onRefresh,
 }) {
   const clock = useISTClock();
   const totalCells = counts
@@ -49,7 +51,12 @@ export default function Header({
       </nav>
 
       <div className="header-right">
-        <span className="dash-clock">{clock}</span>
+        <LedTimer
+          nextInSeconds={cycle?.next_cycle_in_s}
+          onRefresh={onRefresh}
+          size="sm"
+          label="NEXT UPDATE"
+        />
 
         <div className="lang-toggle" role="group" aria-label="language">
           <button
