@@ -57,6 +57,7 @@ export default function Dashboard({ lang, onLang }) {
   const [radarOpacity, setRadarOpacity] = useState(0.65);
   const [alertDistrict, setAlertDistrict] = useState(null);
   const [armedMap, setArmedMap] = useState(() => loadArmed());
+  const [mobileView, setMobileView] = useState('map');
 
   // Fresh values for WS / poll callbacks without stale closures.
   const stateRef = useRef({ regionId, leadMin });
@@ -276,7 +277,23 @@ export default function Dashboard({ lang, onLang }) {
         </div>
       )}
 
-      <div className="main">
+      {/* Mobile Mode Switcher: Radar/Map vs District Countdown Alerts */}
+      <div className="dash-mobile-nav">
+        <button
+          className={`dash-mobile-nav-btn ${mobileView === 'map' ? 'active' : ''}`}
+          onClick={() => setMobileView('map')}
+        >
+          <span>🗺️</span> {t.radar || 'Radar & Nowcast'}
+        </button>
+        <button
+          className={`dash-mobile-nav-btn ${mobileView === 'districts' ? 'active' : ''}`}
+          onClick={() => setMobileView('districts')}
+        >
+          <span>⚡</span> {t.districtAlerts} ({districts.length})
+        </button>
+      </div>
+
+      <div className={`main ${mobileView === 'map' ? 'mobile-show-map' : 'mobile-show-districts'}`}>
         <div className="map-area">
           <StormMap
             region={region}

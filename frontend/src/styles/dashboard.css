@@ -386,20 +386,152 @@ body:not(.is-app) #root { min-height: 100vh; }
 .footer-demo { color: #d6a94f; display: inline-flex; align-items: center; gap: 7px; }
 .footer-conn { color: var(--br-muted); font-family: var(--br-font-mono); font-size: 10.5px; }
 
-/* ---------- Responsive ---------- */
+/* ---------- Responsive Mobile Styles ---------- */
+.dash-mobile-nav {
+  display: none;
+}
+
 @media (max-width: 1150px) {
   .district-panel { width: 300px; }
   .cycle-block { display: none; }
   .brand-sub { display: none; }
 }
+
 @media (max-width: 900px) {
   .count-badges { display: none; }
   .dash-clock { display: none; }
-  .district-panel {
-    position: absolute; right: 0; top: 0; bottom: 0;
-    box-shadow: -16px 0 40px rgba(0,0,0,0.55);
-    width: min(320px, 84vw);
-  }
   .map-legend { display: none; }
-  .layer-panel { min-width: 0; max-width: 200px; }
+  
+  /* Mobile Mode Switcher Bar */
+  .dash-mobile-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(8, 16, 32, 0.92);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 50;
+  }
+  
+  .dash-mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--br-muted-2);
+    border-radius: var(--r-pill);
+    padding: 8px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .dash-mobile-nav-btn.active {
+    background: var(--br-grad-soft);
+    border-color: rgba(56, 189, 248, 0.55);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.25);
+  }
+
+  /* Main split views on mobile */
+  .main.mobile-show-map .map-area {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .main.mobile-show-map .district-panel {
+    display: none !important;
+  }
+
+  .main.mobile-show-districts .map-area {
+    display: none !important;
+  }
+  .main.mobile-show-districts .district-panel {
+    display: flex !important;
+    position: static !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: calc(100vh - 120px) !important;
+    box-shadow: none !important;
+  }
+
+  .layer-panel {
+    top: 8px;
+    left: 8px;
+    padding: 8px 10px;
+    font-size: 11px;
+    max-width: 180px;
+    backdrop-filter: blur(20px);
+  }
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    gap: 8px;
+    min-height: auto;
+  }
+  .brand {
+    flex: 1;
+    min-width: 140px;
+  }
+  .brand-title {
+    font-size: 15px;
+  }
+  .region-bar {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 0 2px;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  .region-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .region-chip {
+    padding: 5px 12px;
+    font-size: 11.5px;
+    flex-shrink: 0;
+  }
+  
+  .header-right {
+    gap: 8px;
+  }
+  .lang-toggle button {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* Compact Time Slider on Mobile */
+  .time-slider {
+    bottom: 8px;
+    width: calc(100% - 16px);
+    padding: 8px 12px;
+    gap: 10px;
+    border-radius: var(--r-md);
+  }
+  .play-btn {
+    width: 34px;
+    height: 34px;
+  }
+  .slider-lead {
+    font-size: 14px;
+  }
+  .slider-valid {
+    display: none;
+  }
+  .slider-ticks {
+    font-size: 8.5px;
+  }
 }

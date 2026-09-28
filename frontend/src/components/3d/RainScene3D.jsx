@@ -99,7 +99,7 @@ export default function RainScene3D({ mode = 'background' }) {
   const [dropSize, setDropSize] = useState('huge'); // 'standard' | 'large' | 'huge'
   const [lightningEnabled, setLightningEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
 
   // Initialize audio synthesizer instance
   useEffect(() => {
@@ -682,6 +682,7 @@ export default function RainScene3D({ mode = 'background' }) {
 
       {/* Floating 3D Storm Atmosphere Controller */}
       <div
+        className="storm-atmosphere-controller"
         style={{
           position: 'fixed',
           bottom: 24,

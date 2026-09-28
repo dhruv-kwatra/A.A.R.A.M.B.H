@@ -109,3 +109,14 @@ button { font-family: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
 }
+
+/* Responsive Atmosphere Controller Widget */
+@media (max-width: 640px) {
+  .storm-atmosphere-controller {
+    bottom: 12px !important;
+    right: 12px !important;
+    max-width: calc(100vw - 24px) !important;
+    border-radius: 12px !important;
+    padding: 8px 12px !important;
+  }
+}

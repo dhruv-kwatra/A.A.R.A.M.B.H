@@ -76,6 +76,7 @@ export default function RelocationDashboard({ lang = 'en', onLang }) {
   const [toast, setToast] = useState(null);
   const [basemapKey, setBasemapKey] = useState('osm_dark');
   const activeBasemap = BASEMAP_PRESETS[basemapKey] || BASEMAP_PRESETS.osm_dark;
+  const [mobileTab, setMobileTab] = useState('map');
   const mapRef = useRef(null);
 
   const showToast = (msg) => {
@@ -258,8 +259,24 @@ export default function RelocationDashboard({ lang = 'en', onLang }) {
         </div>
       </header>
 
+      {/* Mobile Mode Switcher: GIS Map vs Prioritization Table */}
+      <div className="reloc-mobile-tabs">
+        <button
+          className={`reloc-mobile-tab-btn ${mobileTab === 'map' ? 'active' : ''}`}
+          onClick={() => setMobileTab('map')}
+        >
+          <MapPin size={13} /> Spatial GIS Map
+        </button>
+        <button
+          className={`reloc-mobile-tab-btn ${mobileTab === 'table' ? 'active' : ''}`}
+          onClick={() => setMobileTab('table')}
+        >
+          <Users size={13} /> Prioritization Table ({redZones.length})
+        </button>
+      </div>
+
       {/* Main Content Area */}
-      <main className="reloc-main">
+      <main className={`reloc-main mobile-tab-${mobileTab}`}>
         {/* Left Column: Stats, Charts, Phasing Matrix */}
         <div className="reloc-left-col">
           {/* Quick Metrics */}

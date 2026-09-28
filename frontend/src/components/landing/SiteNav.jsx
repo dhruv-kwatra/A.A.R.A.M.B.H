@@ -1,10 +1,21 @@
-import { Logo, IconArrowRight } from '../icons.jsx';
+import { useState } from 'react';
+import { Logo, IconArrowRight, IconMenu, IconX } from '../icons.jsx';
 import { go } from '../../router.js';
 import { useISTClock } from '../../hooks/useLive.js';
 
 /** Glassy sticky nav: logo, section links, live IST clock, lang toggle, CTA. */
 export function SiteNav({ t, lang, onLang, online }) {
   const clock = useISTClock();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleNavClick = (hash) => {
+    setMobileMenuOpen(false);
+    if (hash) {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="site-nav">
       <div className="nav-inner">
@@ -21,7 +32,7 @@ export function SiteNav({ t, lang, onLang, online }) {
           <a href="#proof">{t.navProof}</a>
           <a href="#data">{t.navData}</a>
         </div>
-        <div className="nav-right">
+        <div className="nav-right desktop-only-flex">
           <span className="nav-clock">
             <span className={`live-badge ${online ? '' : 'off'}`}>
               <span className="dot" />
@@ -40,7 +51,59 @@ export function SiteNav({ t, lang, onLang, online }) {
             {t.launchDemo} <IconArrowRight size={15} />
           </button>
         </div>
+
+        {/* Mobile Nav Actions */}
+        <div className="nav-mobile-actions">
+          <button className="btn btn-primary btn-xs" onClick={() => go('/app')}>
+            Live Demo
+          </button>
+          <button
+            className="mobile-hamburger-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <IconX size={20} /> : <IconMenu size={20} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Slide-down Drawer */}
+      {mobileMenuOpen && (
+        <div className="nav-mobile-drawer">
+          <div className="mobile-drawer-links">
+            <a href="#live" onClick={() => handleNavClick('#live')}>{t.navLive}</a>
+            <a href="#hazards" onClick={() => handleNavClick('#hazards')}>{t.navHazards}</a>
+            <a href="#how" onClick={() => handleNavClick('#how')}>{t.navHow}</a>
+            <a href="#regions" onClick={() => handleNavClick('#regions')}>{t.navRegions}</a>
+            <a href="#proof" onClick={() => handleNavClick('#proof')}>{t.navProof}</a>
+            <a href="#data" onClick={() => handleNavClick('#data')}>{t.navData}</a>
+          </div>
+
+          <div className="mobile-drawer-controls">
+            <div className="mobile-drawer-row">
+              <span className={`live-badge ${online ? '' : 'off'}`}>
+                <span className="dot" />
+                {online ? t.liveNow : t.offline}
+              </span>
+              <span style={{ fontSize: 13, color: '#94a3b8', fontFamily: 'monospace' }}>{clock}</span>
+            </div>
+
+            <div className="nav-lang" role="group" aria-label="language">
+              <button className={lang === 'en' ? 'active' : ''} onClick={() => onLang('en')}>EN</button>
+              <button className={lang === 'hi' ? 'active' : ''} onClick={() => onLang('hi')}>हिंदी</button>
+            </div>
+          </div>
+
+          <div className="mobile-drawer-buttons">
+            <button className="btn btn-primary" onClick={() => { setMobileMenuOpen(false); go('/app'); }} style={{ width: '100%', justifyContent: 'center' }}>
+              {t.launchDemo} <IconArrowRight size={15} />
+            </button>
+            <button className="btn btn-ghost" onClick={() => { setMobileMenuOpen(false); go('/relocation'); }} style={{ width: '100%', justifyContent: 'center', borderColor: 'rgba(56, 189, 248, 0.4)', color: '#38bdf8' }}>
+              Relocation &amp; Carrying Capacity
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
