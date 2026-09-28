@@ -5,6 +5,7 @@ import { useLiveStats, useISTClock } from '../../hooks/useLive.js';
 import { go } from '../../router.js';
 import { IconArrowRight } from '../icons.jsx';
 import Reveal from './Reveal.jsx';
+import HeroLeafletMap from './HeroLeafletMap.jsx';
 
 const SEV = {
   yellow: { color: '#facc15', r: 5 },
@@ -267,7 +268,7 @@ export function Hero({ t, live }) {
               <span className="hud-region">{t.allIndia}</span>
               <span>{t.lastCycle}: {formatIST(lastCycle)}</span>
             </div>
-            <StormCanvas cells={cells} />
+            <HeroLeafletMap regions={regions} worstSev={stats.worst} />
             <div className="hero-foot">
               <span>{t.activeCells}: <b>{online ? stats.cells : '—'}</b></span>
               <span>{t.regionsOnline}: <b>{online ? `${regions.length}/8` : '—'}</b></span>
