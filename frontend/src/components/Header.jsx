@@ -23,12 +23,12 @@ export default function Header({
   return (
     <header className="app-header">
       <div className="brand">
-        <button className="brand-back" onClick={() => go('/')} title="BhoomiRakshak home">
+        <button className="brand-back" onClick={() => go('/')} title="A.A.R.A.M.B.H home">
           <IconArrowLeft size={14} />
         </button>
         <Logo size={24} />
         <div>
-          <div className="brand-title">BhoomiRakshak</div>
+          <div className="brand-title">A.A.R.A.M.B.H</div>
           <div className="brand-sub">{t.subtitle}</div>
         </div>
       </div>

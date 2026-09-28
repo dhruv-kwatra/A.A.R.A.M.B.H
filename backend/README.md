@@ -1,5 +1,5 @@
-# BhoomiRakshak — Nowcasting Backend (SIH26084)
-### Bharat Convective Nowcasting — India-only
+# A.A.R.A.M.B.H — Atmospheric Analysis & Rapid Alert Monitoring for Bursts & Hazards
+### Backend Services — Bharat Convective Nowcasting & Disaster Resilience (SIH26084)
 
 FastAPI service implementing the convective-scale nowcasting pipeline for
 **8 Indian metro windows**: **ingest → optical-flow nowcast → 4 hazard heads → GeoJSON polygons → WebSocket push**.

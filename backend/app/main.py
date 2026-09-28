@@ -38,7 +38,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 
 VERIFICATION_JSON = Path(__file__).resolve().parents[2] / "verification" / "results.json"
 
-app = FastAPI(title="BhoomiRakshak Nowcasting & Relocation API — Unified Disaster Management Platform",
+app = FastAPI(title="A.A.R.A.M.B.H API — Atmospheric Analysis & Rapid Alert Monitoring for Bursts & Hazards",
               version="2.1.0")
 app.add_middleware(
     CORSMiddleware,

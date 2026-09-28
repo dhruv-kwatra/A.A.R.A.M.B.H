@@ -182,15 +182,15 @@ export default function RelocationDashboard({ lang = 'en', onLang }) {
       {/* Header Bar */}
       <header className="reloc-header">
         <div className="reloc-brand-group">
-          <button className="brand-back" onClick={() => go('/')} title="BhoomiRakshak Home">
+          <button className="brand-back" onClick={() => go('/')} title="A.A.R.A.M.B.H Home">
             <Logo size={26} />
           </button>
           <div>
             <div style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.01em' }}>
-              BhoomiRakshak AI-GIS
+              A.A.R.A.M.B.H AI-GIS
             </div>
             <div style={{ fontSize: 11, color: 'var(--br-muted)' }}>
-              Vulnerability Prioritization & Relocation Engine (NDMA/DDMA)
+              Atmospheric Analysis &amp; Rapid Alert Monitoring · Carrying Capacity &amp; Relocation
             </div>
           </div>
         </div>

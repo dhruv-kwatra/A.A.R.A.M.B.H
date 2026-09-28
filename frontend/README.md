@@ -1,7 +1,7 @@
-# BhoomiRakshak Frontend — Bharat Convective Nowcasting
+# A.A.R.A.M.B.H Frontend — Atmospheric Analysis & Rapid Alert Monitoring for Bursts & Hazards
 
-React + Vite marketing site + live operations dashboard for SIH26084.
-Apple-style dark aesthetic, driven by the live nowcast API.
+React + Three.js 3D + Vite marketing site + live convective operations and AI-GIS relocation dashboard for SIH26084.
+Apple-grade glassmorphic aesthetic with real-time 3D rain simulation, driven by the live nowcast API.
 
 ## Routes
 

@@ -1,13 +1,13 @@
-# BhoomiRakshak — Unified Disaster Intelligence & Convective Nowcasting
-### Bharat Disaster Resilience Platform (SIH26084 · SIH26191)
+# A.A.R.A.M.B.H — Atmospheric Analysis & Rapid Alert Monitoring for Bursts & Hazards
+### Bharat Disaster Resilience & Convective Nowcasting Platform (SIH26084 · SIH26191)
 
-**A unified, end-to-end operational platform fusing real-time convective nowcasting (0–6 h lead, ~1 km resolution) with AI-GIS disaster relocation & carrying capacity planning for DDMA, SDMA, and NDRF authorities.**
+**A.A.R.A.M.B.H (Atmospheric Analysis & Rapid Alert Monitoring for Bursts & Hazards)** is a unified, end-to-end operational platform fusing real-time convective nowcasting (0–6 h lead, ~1 km resolution) with AI-GIS disaster relocation & carrying capacity planning for DDMA, SDMA, and NDRF authorities.
 
-Thunderstorms, landslides, and flash floods kill more Indians every year than cyclones — yet warnings and relocation decisions often reach district control rooms late and disconnected. BhoomiRakshak unifies two mission-critical pillars:
+Severe thunderstorms, cloudbursts, hail, lightning, landslides, and flash floods kill thousands every year — yet warnings and relocation decisions often reach district control rooms late and disconnected. **A.A.R.A.M.B.H** unifies two mission-critical pillars:
 1. **Pillar 1: Convective Nowcasting (0–6 h)** — Every 5 minutes, dense Farneback optical flow advects storm cells across **8 Indian metro windows**, generating **hazard polygons with IMD yellow/orange/red colour codes and bilingual (English + Hindi) advisories**.
 2. **Pillar 2: AI-GIS Relocation & Carrying Capacity Engine** — Fuses spatial multi-hazard zones with census habitations and demographic vulnerability (elderly %, disability %, Kutcha housing), ranks habitations into **Immediate, Short-Term, and Medium-Term action phases**, allocates residents to safe candidate camps with carrying capacity constraints, and generates **statutory legal certificates with SHA-256 blockchain audit hashes**.
 
-> **Status: working prototype.** Full end-to-end pipeline is operational: live Open-Meteo atmospheric forcing, synthetic storm simulator standing in for institutional radar/satellite feeds, Farneback optical flow, 4 hazard heads, GeoPandas spatial carrying capacity engine, dynamic ReportLab certificate generation, and an Apple-grade interactive GIS dashboard.
+> **Status: working prototype.** Full end-to-end pipeline is operational: live Open-Meteo atmospheric forcing, synthetic storm simulator standing in for institutional radar/satellite feeds, Farneback optical flow, 4 hazard heads, GeoPandas spatial carrying capacity engine, dynamic ReportLab certificate generation, and an Apple-grade interactive 3D glassmorphic GIS dashboard.
 
 ## Unified Architecture
 

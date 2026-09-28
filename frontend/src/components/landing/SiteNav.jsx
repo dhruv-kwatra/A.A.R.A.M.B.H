@@ -11,7 +11,7 @@ export function SiteNav({ t, lang, onLang, online }) {
         <a className="nav-brand" onClick={() => go('/')} role="link" tabIndex={0}
            onKeyDown={(e) => e.key === 'Enter' && go('/')}>
           <Logo />
-          <span>Bhoomi<span className="grad-text">Rakshak</span></span>
+          <span>A.A.R.A.<span className="grad-text">M.B.H</span></span>
         </a>
         <div className="nav-links">
           <a href="#live">{t.navLive}</a>
@@ -55,8 +55,11 @@ export function SiteFooter({ t }) {
             <a className="nav-brand" onClick={() => go('/')} role="link" tabIndex={0}
                onKeyDown={(e) => e.key === 'Enter' && go('/')}>
               <Logo />
-              <span>Bhoomi<span className="grad-text">Rakshak</span></span>
+              <span>A.A.R.A.<span className="grad-text">M.B.H</span></span>
             </a>
+            <div style={{ fontSize: 13, color: '#38bdf8', fontWeight: 600, marginTop: 4, letterSpacing: '0.01em' }}>
+              Atmospheric Analysis &amp; Rapid Alert Monitoring for Bursts &amp; Hazards
+            </div>
             <p>{t.footTag}</p>
           </div>
           <div className="foot-col">

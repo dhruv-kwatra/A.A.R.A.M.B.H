@@ -232,7 +232,9 @@ export function Hero({ t, live }) {
             <span className={`live-badge ${online ? '' : 'off'}`}>
               <span className="dot" />{online ? t.liveFeed : t.offline}
             </span>
-            <span>{t.kicker}</span>
+            <strong style={{ letterSpacing: '0.05em', color: '#e0f2fe', fontWeight: 700 }}>A.A.R.A.M.B.H</strong>
+            <span style={{ opacity: 0.5 }}>·</span>
+            <span>Atmospheric Analysis &amp; Rapid Alert Monitoring for Bursts &amp; Hazards</span>
           </div>
         </Reveal>
         <Reveal delay={80}>
