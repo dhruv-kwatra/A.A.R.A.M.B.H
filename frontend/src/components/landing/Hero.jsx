@@ -279,20 +279,19 @@ export function Hero({ t, live }) {
               <span className="hud-region">{t.allIndia}</span>
               <span>{t.lastCycle}: {formatIST(lastCycle)}</span>
             </div>
-            <div className="hero-hud-timer">
+            <HeroLeafletMap regions={regions} worstSev={stats.worst} />
+            <div className="hero-foot">
+              <div className="hero-foot-metrics">
+                <span>{t.activeCells}: <b>{online ? stats.cells : '—'}</b></span>
+                <span>{t.regionsOnline}: <b>{online ? `${regions.length}/8` : '—'}</b></span>
+                <span>{t.worstNow}: <b><span className="sev-dot" style={{ background: SEV[stats.worst].color }} />{sevName}</b></span>
+              </div>
               <LedTimer
                 nextInSeconds={nextCycleInS}
                 onRefresh={live.refresh}
                 size="sm"
                 label="CYCLE UPDATE"
               />
-            </div>
-            <HeroLeafletMap regions={regions} worstSev={stats.worst} />
-            <div className="hero-foot">
-              <span>{t.activeCells}: <b>{online ? stats.cells : '—'}</b></span>
-              <span>{t.regionsOnline}: <b>{online ? `${regions.length}/8` : '—'}</b></span>
-              <span>{t.worstNow}: <b><span className="sev-dot" style={{ background: SEV[stats.worst].color }} />{sevName}</b></span>
-              <span>{clock}</span>
             </div>
           </div>
         </Reveal>
