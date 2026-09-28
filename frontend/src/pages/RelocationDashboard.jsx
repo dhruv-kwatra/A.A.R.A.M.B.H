@@ -25,6 +25,43 @@ const PHASE_COLORS = {
   'Medium-Term': '#eab308',
 };
 
+// 100% Free Open Source Basemap Presets (No API Keys, No Watermarks)
+const BASEMAP_PRESETS = {
+  osm_dark: {
+    id: 'osm_dark',
+    name: 'OpenStreetMap Dark (Free OSS)',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors',
+    className: 'reloc-osm-dark-tiles',
+    maxZoom: 19,
+  },
+  esri_dark: {
+    id: 'esri_dark',
+    name: 'Esri Dark Canvas (GIS)',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+    refUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+    className: '',
+    maxZoom: 16,
+  },
+  osm_standard: {
+    id: 'osm_standard',
+    name: 'OpenStreetMap Standard (Light)',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors',
+    className: '',
+    maxZoom: 19,
+  },
+  opentopo: {
+    id: 'opentopo',
+    name: 'OpenTopoMap (Topography)',
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> | &copy; <a href="https://opentopomap.org" target="_blank" rel="noreferrer">OpenTopoMap</a>',
+    className: '',
+    maxZoom: 17,
+  },
+};
+
 export default function RelocationDashboard({ lang = 'en', onLang }) {
   const [layers, setLayers] = useState({ hazards: null, habitations: null, sites: null });
   const [redZones, setRedZones] = useState([]);
@@ -37,6 +74,8 @@ export default function RelocationDashboard({ lang = 'en', onLang }) {
   const [citizenMessage, setCitizenMessage] = useState('');
   const [feedbackStatus, setFeedbackStatus] = useState(null);
   const [toast, setToast] = useState(null);
+  const [basemapKey, setBasemapKey] = useState('osm_dark');
+  const activeBasemap = BASEMAP_PRESETS[basemapKey] || BASEMAP_PRESETS.osm_dark;
   const mapRef = useRef(null);
 
   const showToast = (msg) => {
@@ -376,9 +415,21 @@ export default function RelocationDashboard({ lang = 'en', onLang }) {
               ref={mapRef}
             >
               <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+                key={basemapKey}
+                url={activeBasemap.url}
+                attribution={activeBasemap.attribution}
+                className={activeBasemap.className}
+                maxZoom={activeBasemap.maxZoom || 19}
               />
+              {activeBasemap.refUrl && (
+                <TileLayer
+                  key={`${basemapKey}-ref`}
+                  url={activeBasemap.refUrl}
+                  attribution=""
+                  zIndex={6}
+                  maxZoom={activeBasemap.maxZoom || 19}
+                />
+              )}
 
               {layers.hazards && (
                 <GeoJSON
@@ -405,6 +456,23 @@ export default function RelocationDashboard({ lang = 'en', onLang }) {
                 />
               )}
             </MapContainer>
+
+            {/* Basemap Switcher (100% Free Open Source) */}
+            <div className="reloc-basemap-ctrl">
+              <Layers size={13} style={{ color: '#38bdf8' }} />
+              <select
+                className="reloc-basemap-select"
+                value={basemapKey}
+                onChange={(e) => setBasemapKey(e.target.value)}
+                aria-label="Free Basemap Provider"
+              >
+                <option value="osm_dark">OpenStreetMap Dark (Free OSS)</option>
+                <option value="esri_dark">Esri Dark Canvas (GIS)</option>
+                <option value="osm_standard">OpenStreetMap Standard</option>
+                <option value="opentopo">OpenTopoMap (Topography)</option>
+              </select>
+              <span className="reloc-oss-badge">FREE OSS</span>
+            </div>
 
             {/* Map Legend */}
             <div className="reloc-legend">
