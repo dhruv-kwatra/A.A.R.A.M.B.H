@@ -13,9 +13,11 @@
 
 .reloc-header {
   height: 58px;
-  background: rgba(10, 10, 16, 0.85);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--br-border, rgba(255, 255, 255, 0.09));
+  background: rgba(6, 13, 26, 0.52);
+  backdrop-filter: blur(28px) saturate(1.85);
+  -webkit-backdrop-filter: blur(28px) saturate(1.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -109,10 +111,13 @@
 }
 
 .reloc-card {
-  background: rgba(16, 16, 24, 0.75);
-  border: 1px solid var(--br-border, rgba(255, 255, 255, 0.09));
-  border-radius: 12px;
-  backdrop-filter: blur(12px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(8, 16, 32, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  backdrop-filter: blur(28px) saturate(1.85);
+  -webkit-backdrop-filter: blur(28px) saturate(1.85);
+  box-shadow: 0 18px 45px -10px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -126,11 +131,14 @@
 }
 
 .reloc-stat-box {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
   padding: 8px 10px;
   text-align: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .reloc-stat-val {
