@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { MapContainer, TileLayer, GeoJSON, Tooltip as LeafletTooltip } from 'react-leaflet';
+import { MapContainer, TileLayer, WMSTileLayer, GeoJSON, Tooltip as LeafletTooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip as ChartTooltip, ResponsiveContainer, Cell,
@@ -27,6 +27,16 @@ const PHASE_COLORS = {
 
 // 100% Free Open Source Basemap Presets (No API Keys, No Watermarks)
 const BASEMAP_PRESETS = {
+  gebco: {
+    id: 'gebco',
+    name: 'GEBCO Physical Relief (Topography)',
+    wms: true,
+    url: 'https://wms.gebco.net/mapserv?',
+    layers: 'GEBCO_LATEST',
+    attribution: '&copy; GEBCO / NOAA / IHO / IOC',
+    refUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+    maxZoom: 16,
+  },
   osm_dark: {
     id: 'osm_dark',
     name: 'OpenStreetMap Dark (Free OSS)',
@@ -431,13 +441,25 @@ export default function RelocationDashboard({ lang = 'en', onLang }) {
               style={{ height: '100%', width: '100%' }}
               ref={mapRef}
             >
-              <TileLayer
-                key={basemapKey}
-                url={activeBasemap.url}
-                attribution={activeBasemap.attribution}
-                className={activeBasemap.className}
-                maxZoom={activeBasemap.maxZoom || 19}
-              />
+              {activeBasemap.wms ? (
+                <WMSTileLayer
+                  key={basemapKey}
+                  url={activeBasemap.url}
+                  layers={activeBasemap.layers}
+                  format="image/png"
+                  transparent={false}
+                  attribution={activeBasemap.attribution}
+                  maxZoom={activeBasemap.maxZoom || 18}
+                />
+              ) : (
+                <TileLayer
+                  key={basemapKey}
+                  url={activeBasemap.url}
+                  attribution={activeBasemap.attribution}
+                  className={activeBasemap.className}
+                  maxZoom={activeBasemap.maxZoom || 19}
+                />
+              )}
               {activeBasemap.refUrl && (
                 <TileLayer
                   key={`${basemapKey}-ref`}
@@ -483,6 +505,7 @@ export default function RelocationDashboard({ lang = 'en', onLang }) {
                 onChange={(e) => setBasemapKey(e.target.value)}
                 aria-label="Free Basemap Provider"
               >
+                <option value="gebco">GEBCO Relief (Physical Topography)</option>
                 <option value="osm_dark">OpenStreetMap Dark (Free OSS)</option>
                 <option value="esri_dark">Esri Dark Canvas (GIS)</option>
                 <option value="osm_standard">OpenStreetMap Standard</option>

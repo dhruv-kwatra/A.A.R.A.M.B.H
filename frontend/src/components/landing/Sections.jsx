@@ -1,8 +1,9 @@
+import React, { useState } from 'react';
 import { HAZARD_ICON, IconArrowRight, IconRadar, IconWind, IconAlert, IconBell, IconCheck } from '../icons.jsx';
 import { REGIONS_FALLBACK } from '../../utils/api.js';
 import { useLiveStats } from '../../hooks/useLive.js';
 import { go } from '../../router.js';
-import IndiaMap from './IndiaMap.jsx';
+import CoverageLeafletMap from './CoverageLeafletMap.jsx';
 import Reveal from './Reveal.jsx';
 
 /* ---------- Four hazard heads as product cards ---------- */
@@ -93,10 +94,15 @@ export function Regions({ t, live }) {
   const { regions, cycles } = live;
   const stats = useLiveStats(cycles, regions);
   const byId = Object.fromEntries(stats.perRegion.map((r) => [r.id, r]));
+  const [hoveredId, setHoveredId] = useState(null);
+
   const openRegion = (id) => {
     try { sessionStorage.setItem('br_region', id); } catch { /* noop */ }
     go('/app');
   };
+
+  const metroList = regions && regions.length ? regions : REGIONS_FALLBACK;
+
   return (
     <section className="section" id="regions">
       <div className="wrap">
@@ -109,19 +115,30 @@ export function Regions({ t, live }) {
         </Reveal>
         <div className="showcase">
           <Reveal>
-            <IndiaMap />
+            <CoverageLeafletMap
+              regions={metroList}
+              byId={byId}
+              hoveredId={hoveredId}
+              onSelectRegion={openRegion}
+            />
           </Reveal>
           <div className="metro-list">
-            {REGIONS_FALLBACK.map((r, i) => {
+            {metroList.map((r, i) => {
               const liveRow = byId[r.id];
+              const isHovered = hoveredId === r.id;
               return (
                 <Reveal key={r.id} delay={Math.min(i * 50, 300)}>
-                  <button className="metro-row" onClick={() => openRegion(r.id)}>
+                  <button
+                    className={`metro-row ${isHovered ? 'active' : ''}`}
+                    onClick={() => openRegion(r.id)}
+                    onMouseEnter={() => setHoveredId(r.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                  >
                     <span className="m-idx">{String(i + 1).padStart(2, '0')}</span>
                     <span className="m-name">{r.name}</span>
                     <span className="m-coord">{r.center[0].toFixed(2)}°N {r.center[1].toFixed(2)}°E</span>
                     <span className="m-cells grad-text">{liveRow ? `${liveRow.total} ${t.cells}` : `— ${t.cells}`}</span>
-                    <IconArrowRight size={15} style={{ color: 'var(--br-muted)' }} />
+                    <IconArrowRight size={15} style={{ color: isHovered ? '#38bdf8' : 'var(--br-muted)' }} />
                   </button>
                 </Reveal>
               );
