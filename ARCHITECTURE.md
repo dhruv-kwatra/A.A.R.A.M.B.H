@@ -5,29 +5,55 @@ Project root: `~/workspace/sih26084-nowcasting/`
 
 ```
 sih26084-nowcasting/
-├── backend/                 # FastAPI service (agent: backend)
+├── backend/                 # FastAPI unified service
 │   ├── app/
-│   │   ├── main.py          # FastAPI app factory, routers, WS
-│   │   ├── config.py        # settings, paths, env
-│   │   ├── ingest/          # workers: open_meteo.py, storm_sim.py, scheduler.py
-│   │   ├── nowcast/         # optical_flow.py (Farneback), extrapolate.py
-│   │   ├── hazards/         # lightning.py, hail.py, downburst.py, cloudburst.py, polygons.py
-│   │   ├── store.py         # SQLite archive + in-memory latest cache
-│   │   └── schemas.py       # pydantic/geojson shapes
+│   │   ├── main.py          # Unified FastAPI app factory, routers, WS
+│   │   ├── config.py        # Settings, paths, metro regions
+│   │   ├── ingest/          # Ingest workers: open_meteo.py, storm_sim.py, scheduler.py
+│   │   ├── nowcast/         # Optical flow (Farneback), semi-Lagrangian advection
+│   │   ├── hazards/         # Lightning, hail, downburst, cloudburst, polygons
+│   │   ├── store.py         # SQLite archive + in-memory cache
+│   │   └── relocation/      # AI-GIS Relocation & Carrying Capacity Engine
+│   │       ├── database.py  # SQLite/PostGIS database session
+│   │       ├── models.py    # HazardZone, Habitation, CandidateSite, RedZone, LegalCertificate
+│   │       ├── engine.py    # Spatial fusion, vulnerability index, capacity matching
+│   │       ├── crud.py      # GeoJSON layer generators
+│   │       ├── pdf_gen.py   # ReportLab statutory certificate generator with SHA-256
+│   │       ├── schemas.py   # Pydantic schemas
+│   │       └── routes.py    # Relocation API endpoints
+│   ├── data/                # open_meteo cache & bhoomi_rakshak.db
 │   ├── requirements.txt
 │   ├── Dockerfile
 │   └── README.md
-├── frontend/                # React+Vite+Leaflet dashboard (agent: frontend)
-│   ├── src/ ...
+├── frontend/                # React + Vite + Leaflet + Recharts dashboard
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── Landing.jsx              # Unified Public Portal & Mission Overview
+│   │   │   ├── Dashboard.jsx            # 0–6h Convective Nowcasting Ops Center
+│   │   │   └── RelocationDashboard.jsx  # AI-GIS Relocation & Carrying Capacity Cockpit
+│   │   ├── components/ ...
+│   │   ├── styles/ ...
+│   │   └── utils/ ...
 │   ├── Dockerfile
 │   └── README.md
-├── verification/            # metrics + case studies (agent: verification)
-│   ├── metrics.py           # CSI, POD, FAR, HSS, FSS, Brier, reliability
-│   ├── run_case_studies.py
-│   └── VERIFICATION_REPORT.md
+├── verification/            # Metrics + case studies (CSI, POD, FAR, HSS, FSS)
 ├── docker-compose.yml       # backend:8000, frontend:80
-└── README.md                # top-level: what it is, quickstart, demo
+└── README.md                # Top-level: what it is, quickstart, demo walkthrough
 ```
+
+## Unified Dual-Pillar Architecture
+BhoomiRakshak merges two mission-critical pillars into one integrated national platform:
+1. **Pillar 1: Convective-Scale Nowcasting (0–6 Hours)**:
+   - High-resolution (~1 km) storm motion advection via Farneback optical flow.
+   - 4 calibrated hazard heads: Lightning flash density, Hail probability, Downburst gusts, and Cloudburst accumulation.
+   - 8 Indian metro windows, IST clocks, bilingual (English + Hindi) IMD colour-coded advisories.
+2. **Pillar 2: AI-GIS Disaster Relocation & Carrying Capacity Planning**:
+   - Multi-hazard spatial overlay (landslides, flash floods, erosion) intersecting census habitations.
+   - Socio-demographic vulnerability scoring (elderly %, disabled %, housing quality, income bracket).
+   - Priority index ranking habitations into Immediate, Short-Term, and Medium-Term action phases.
+   - Explainable AI (XAI) transparent audit justifications.
+   - Greedy carrying capacity matching with safe candidate relief sites.
+   - Dynamically generated official legal certificates with cryptographic SHA-256 blockchain audit hash.
 
 ## Domain (Delhi-NCR demo region, extendable)
 - Grid: 1.2° × 1.2° centered on Delhi (28.61N, 77.23E) → 27.99–29.21N, 76.63–77.83E
@@ -60,6 +86,7 @@ Base URL default `http://localhost:8000`
 | Method | Path | Response |
 |---|---|---|
 | GET | `/api/health` | `{"status":"ok","last_cycle": "<ISO8601>", "mode": "live|demo"}` |
+| GET | `/api/regions` | `[{id, name, center:[lat,lon], districts:[...]}]` |
 | GET | `/api/hazards/latest` | GeoJSON FeatureCollection, polygons for lead=0 (current analysis) |
 | GET | `/api/forecast/{lead_min}` | GeoJSON FeatureCollection for that lead time; `lead_min` ∈ {0,15,...,360} |
 | GET | `/api/radar/latest` | `{"bounds":[[s,w],[n,e]], "grid":[[dBZ...],...], "resolution_km":1.0, "valid_time":"..."}` grid is 96×96 |
@@ -67,6 +94,13 @@ Base URL default `http://localhost:8000`
 | GET | `/api/cycle` | `{"cycle_id":N,"valid_time":...,"next_cycle_in_s":N,"hazard_counts":{...}}` |
 | GET | `/api/verification` | metrics summary JSON (wired to verification module) |
 | WS | `/ws/live` | pushes `{"event":"new_cycle","cycle_id":N,"valid_time":...,"counts":{...}}` on each inference cycle |
+| GET | `/api/layers/hazards` | GeoJSON FeatureCollection of multi-hazard spatial footprints (landslide, flood, outwash) |
+| GET | `/api/layers/habitations` | GeoJSON FeatureCollection of habitations with socio-demographic vulnerability metadata |
+| GET | `/api/layers/candidate-sites` | GeoJSON FeatureCollection of safe candidate relief camps with maximum capacity |
+| POST | `/api/engine/compute` | Triggers spatial fusion, vulnerability index, and greedy carrying capacity allocation |
+| GET | `/api/red-zones` | List of prioritized habitations ranked into Immediate, Short-Term, Medium-Term phases with XAI justifications |
+| POST | `/api/feedback` | Citizen grievance / ground status submission logged to database |
+| GET | `/api/red-zones/{id}/certificate` | Dynamic ReportLab PDF legal relocation certificate with SHA-256 blockchain hash |
 
 ## GeoJSON hazard feature properties (exact keys)
 ```json

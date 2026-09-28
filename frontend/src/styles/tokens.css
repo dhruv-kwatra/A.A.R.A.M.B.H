@@ -1,0 +1,104 @@
+/* BhoomiRakshak design system — Apple-grade dark aesthetic.
+   Single source of truth for landing page + ops dashboard. */
+
+:root {
+  /* ---- palette ---- */
+  --br-bg: #050507;
+  --br-bg-2: #0a0a10;
+  --br-bg-3: #101018;
+  --br-text: #f5f5f7;
+  --br-muted: #86868b;
+  --br-muted-2: #a1a1a6;
+  --br-card: rgba(255, 255, 255, 0.035);
+  --br-card-2: rgba(255, 255, 255, 0.06);
+  --br-border: rgba(255, 255, 255, 0.09);
+  --br-border-2: rgba(255, 255, 255, 0.16);
+  --br-glass: rgba(12, 12, 18, 0.62);
+
+  /* ---- brand accent: one gradient ---- */
+  --br-accent: #38bdf8;
+  --br-accent-2: #818cf8;
+  --br-accent-3: #c084fc;
+  --br-grad: linear-gradient(120deg, #38bdf8 0%, #818cf8 52%, #c084fc 100%);
+  --br-grad-soft: linear-gradient(120deg, rgba(56,189,248,.16), rgba(129,140,248,.16), rgba(192,132,252,.16));
+
+  /* ---- IMD severity ---- */
+  --br-yellow: #facc15;
+  --br-orange: #fb923c;
+  --br-red: #ef4444;
+  --br-green: #22c55e;
+
+  /* ---- type ---- */
+  --br-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Inter", "Segoe UI", system-ui, sans-serif;
+  --br-font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+
+  /* ---- spacing scale ---- */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px;
+  --sp-6: 32px; --sp-7: 48px; --sp-8: 64px; --sp-9: 96px; --sp-10: 128px;
+
+  /* ---- radius ---- */
+  --r-sm: 8px; --r-md: 14px; --r-lg: 22px; --r-xl: 32px; --r-pill: 999px;
+
+  /* ---- shadows ---- */
+  --sh-1: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --sh-2: 0 24px 80px rgba(0, 0, 0, 0.55);
+
+  /* ---- motion ---- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 0.45s;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--br-bg);
+  color: var(--br-text);
+  font-family: var(--br-font);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: rgba(129, 140, 248, 0.35); }
+
+a { color: inherit; }
+
+button { font-family: inherit; }
+
+/* Gradient headline text */
+.grad-text {
+  background: var(--br-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Eyebrow label above section titles */
+.eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--br-accent);
+  margin-bottom: var(--sp-4);
+}
+
+/* Scroll-reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}

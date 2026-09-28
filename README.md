@@ -1,51 +1,56 @@
-# A.A.R.A.M.B.H — Bharat Convective Nowcasting System (BhoomiRakshak)
+# BhoomiRakshak — Unified Disaster Intelligence & Convective Nowcasting
+### Bharat Disaster Resilience Platform (SIH26084 · SIH26191)
 
-**SIH26084 · Convective-scale nowcasting for thunderstorms, hail & cloudbursts over India (0–6 h lead, ~1 km resolution)**
+**A unified, end-to-end operational platform fusing real-time convective nowcasting (0–6 h lead, ~1 km resolution) with AI-GIS disaster relocation & carrying capacity planning for DDMA, SDMA, and NDRF authorities.**
 
-Thunderstorms kill more Indians every year than cyclones — yet the warnings
-that reach a district control room are still broad, late, and hard to act on.
-**A.A.R.A.M.B.H (BhoomiRakshak)** is a working, end-to-end nowcasting system built for the people
-who actually issue those warnings: **DDMA and district-administration users**.
-Every 5 minutes it ingests multi-source observations, nowcasts storm motion
-with optical flow, and pushes **hazard polygons with IMD yellow/orange/red
-colour codes and bilingual (English + Hindi) advisories** to a live GIS
-dashboard — for 8 Indian metro windows, on IST clocks, over an Indian base map.
+Thunderstorms, landslides, and flash floods kill more Indians every year than cyclones — yet warnings and relocation decisions often reach district control rooms late and disconnected. BhoomiRakshak unifies two mission-critical pillars:
+1. **Pillar 1: Convective Nowcasting (0–6 h)** — Every 5 minutes, dense Farneback optical flow advects storm cells across **8 Indian metro windows**, generating **hazard polygons with IMD yellow/orange/red colour codes and bilingual (English + Hindi) advisories**.
+2. **Pillar 2: AI-GIS Relocation & Carrying Capacity Engine** — Fuses spatial multi-hazard zones with census habitations and demographic vulnerability (elderly %, disability %, Kutcha housing), ranks habitations into **Immediate, Short-Term, and Medium-Term action phases**, allocates residents to safe candidate camps with carrying capacity constraints, and generates **statutory legal certificates with SHA-256 blockchain audit hashes**.
 
-> **Status: working prototype.** The full pipeline runs — ingest → nowcast →
-> hazard heads → dashboard — on a clearly-labeled synthetic storm simulator
-> driven by real atmospheric parameters, standing in for IMD DWR / INSAT /
-> lightning feeds until institutional access (status: REQUEST) lands. The
-> verification harness proves the Stage-1 nowcast beats persistence on
-> reconstructed Indian episodes. What is real, what is simulated, and what is
-> still missing is stated plainly in [Honest caveats](#honest-caveats).
+> **Status: working prototype.** Full end-to-end pipeline is operational: live Open-Meteo atmospheric forcing, synthetic storm simulator standing in for institutional radar/satellite feeds, Farneback optical flow, 4 hazard heads, GeoPandas spatial carrying capacity engine, dynamic ReportLab certificate generation, and an Apple-grade interactive GIS dashboard.
 
-## Architecture
+## Unified Architecture
 
 ```
-                        ┌─────────────────────────────────────────┐
-                        │        8 INDIA METRO WINDOWS            │
-                        │  Delhi-NCR · Mumbai · Chennai · Kolkata │
-                        │  Bengaluru · Hyderabad · Ahmedabad      │
-                        │  Lucknow  (each 120×120 @ ~1 km)       │
-                        └───────────────────┬─────────────────────┘
-                                            │ 5-min cycle (IST)
-                                            ▼
-┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌──────────────────┐
-│    INGEST    │   │   NOWCAST    │   │ HAZARD HEADS │   │   SERVE + PUSH   │
-│              │   │              │   │              │   │                  │
-│ Open-Meteo   │──▶│ Dense        │──▶│ ⛈ Thunder-   │──▶│ FastAPI          │
-│ live CAPE/   │   │ Farneback    │   │   storm      │   │ · GeoJSON        │
-│ CIN, 850 hPa │   │ optical flow │   │ 🧊 Hail      │   │   polygons       │
-│ wind (real)  │   │ (per-pixel   │   │ 🌧 Cloud-    │   │ · /api/* (IST)   │
-│      +       │   │ storm motion)│   │   burst      │   │ · WS /ws/live    │
-│ Storm sim    │   │ 15–360 min   │   │ 💨 Damaging  │   │ · SQLite store   │
-│ (DEMO stand- │   │ leads,       │   │   wind       │   │                  │
-│ in for DWR / │   │ semi-Lagr.   │   │ + bilingual  │   │ React + Leaflet  │
-│ INSAT /      │   │ advection    │   │ advisories   │   │ dashboard        │
-│ lightning)   │   │              │   │ (EN + HI)    │   │ · Bhuvan base map│
-└──────────────┘   └──────────────┘   └──────────────┘   │ · IMD colour     │
-                                                        │   codes          │
-                                                        └──────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                                   BHOOMIRAKSHAK PLATFORM                                │
+└──────────────────────────┬──────────────────────────────────────────┬───────────────────┘
+                           │                                          │
+              PILLAR 1: CONVECTIVE NOWCAST (0–6H)       PILLAR 2: AI-GIS RELOCATION & XAI
+                           │                                          │
+            ┌──────────────┴──────────────┐            ┌──────────────┴──────────────┐
+            │   8 Metro Windows (~1 km)   │            │   Multi-Hazard GIS Layers   │
+            │  Delhi-NCR · Mumbai · ...   │            │  Landslide · Flood · Outwash│
+            └──────────────┬──────────────┘            └──────────────┬──────────────┘
+                           ▼                                          ▼
+            ┌─────────────────────────────┐            ┌─────────────────────────────┐
+            │  Farneback Optical Flow     │            │  Demographic Vulnerability  │
+            │  Semi-Lagrangian Advection  │            │  Elderly % · Kutcha Housing │
+            └──────────────┬──────────────┘            └──────────────┬──────────────┘
+                           ▼                                          ▼
+            ┌─────────────────────────────┐            ┌─────────────────────────────┐
+            │  4 Calibrated Hazard Heads  │            │  Priority & Carrying Cap.   │
+            │  ⚡Lightning 🧊Hail 💨Wind  │            │  Greedy Safe-Camp Allocation│
+            │  🌧Cloudburst               │            │  Immediate / Short / Medium │
+            └──────────────┬──────────────┘            └──────────────┬──────────────┘
+                           │                                          │
+                           ▼                                          ▼
+            ┌─────────────────────────────┐            ┌─────────────────────────────┐
+            │  GeoJSON Hazard Polygons    │            │  Statutory Legal Directives │
+            │  Bilingual EN/HI Advisories │            │  ReportLab PDF + SHA-256    │
+            └──────────────┬──────────────┘            └──────────────┬──────────────┘
+                           │                                          │
+                           └──────────────────┬───────────────────────┘
+                                              ▼
+                        ┌───────────────────────────────────────────┐
+                        │      UNIFIED FASTAPI BACKEND (:8000)      │
+                        │    SQLite / PostGIS · WebSocket /ws/live  │
+                        └─────────────────────┬─────────────────────┘
+                                              ▼
+                        ┌───────────────────────────────────────────┐
+                        │    APPLE-GRADE REACT+LEAFLET DASHBOARD    │
+                        │  #/ Landing · #/app Nowcast · #/relocation│
+                        └───────────────────────────────────────────┘
 ```
 
 **Verification** (`verification/`) sits alongside: CSI/POD/FAR/HSS, FSS,
@@ -111,6 +116,9 @@ python3 run_case_studies.py               # ~2 s; writes results.json,
    docs: real Open-Meteo CAPE/CIN/850 hPa wind drive a synthetic reflectivity
    field standing in for DWR/INSAT/lightning until access is granted. Swap in
    the India-first feeds from the table below with no API change.
+7. **Switch to Relocation Planning Mode.** Click **"Relocation Planning →"** in the top navigation bar or from the landing page. The AI-GIS disaster relocation cockpit opens with spatial multi-hazard footprints, vulnerable habitations, and candidate relief camps.
+8. **Trigger "RUN ANALYTICS ENGINE".** Click the blue **RUN ANALYTICS ENGINE** button: the backend intersects spatial hazard layers with demographic vulnerability (elderly %, disabled %, Kutcha housing, low income), computing priority scores and allocating residents to safe camps without exceeding carrying capacity.
+9. **Explainable AI (XAI) & Statutory Legal Certificate.** Click on an Immediate Phase red zone to view the transparent XAI justification. Click **"Download Legal Certificate (PDF)"**: a dynamically generated, tamper-evident directive is downloaded with a cryptographic SHA-256 blockchain audit hash.
 
 ## Data sources — India first
 

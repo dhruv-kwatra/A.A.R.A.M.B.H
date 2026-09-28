@@ -1,4 +1,5 @@
 import { formatIST } from '../utils/api.js';
+import { IconPlay, IconPause } from './icons.jsx';
 
 export default function TimeSlider({
   leadMin,
@@ -16,13 +17,17 @@ export default function TimeSlider({
         title={playing ? t.pause : t.play}
         aria-label={playing ? t.pause : t.play}
       >
-        {playing ? '⏸' : '▶'}
+        {playing ? <IconPause size={16} /> : <IconPlay size={16} />}
       </button>
       <div className="slider-body">
         <div className="slider-top">
           <span className="slider-label">{t.forecastLead}</span>
           <span className="slider-lead">
-            {leadMin === 0 ? t.now : `T+${leadMin} ${t.minutes}`}
+            {leadMin === 0 ? (
+              t.now
+            ) : (
+              <span className="grad-text">T+{leadMin} {t.minutes}</span>
+            )}
           </span>
           <span className="slider-valid">
             {t.validTime}: {formatIST(validTimeISO)}

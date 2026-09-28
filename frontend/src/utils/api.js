@@ -266,3 +266,36 @@ export function escHtml(s) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+/* =========================================================================
+   Disaster Relocation & Carrying Capacity API Methods
+   ========================================================================= */
+
+export async function fetchLayers() {
+  const [hazards, habitations, sites] = await Promise.all([
+    apiFetch('/api/layers/hazards'),
+    apiFetch('/api/layers/habitations'),
+    apiFetch('/api/layers/candidate-sites'),
+  ]);
+  return { hazards, habitations, sites };
+}
+
+export async function fetchRedZones() {
+  return apiFetch('/api/red-zones');
+}
+
+export async function runEngineCompute() {
+  return apiFetch('/api/engine/compute', { method: 'POST' });
+}
+
+export function getCertificateUrl(zoneId) {
+  return `${API_URL}/api/red-zones/${zoneId}/certificate`;
+}
+
+export async function submitCitizenFeedback(feedback) {
+  return apiFetch('/api/feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(feedback),
+  });
+}

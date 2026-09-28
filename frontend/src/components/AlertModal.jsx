@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { IconBell, IconCheck } from './icons.jsx';
 
 const LS_KEY = 'bhoomirakshak_alerts_v1';
 
@@ -38,14 +39,15 @@ export default function AlertModal({ district, regionId, lang, t, onClose, onSav
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <div className="modal-title">
-          🔔 {t.alertModalTitle} — {district}
+          <span className="m-ic"><IconBell size={20} /></span>
+          {t.alertModalTitle} — {district}
         </div>
         <div className="modal-sub">{t.alertModalSub}</div>
         {done ? (
           <div className="modal-done">
-            <div className="done-icon">✅</div>
+            <div className="done-icon"><IconCheck size={26} /></div>
             <div>{t.alertSaved}</div>
             <button className="arm-btn" onClick={onClose}>
               {lang === 'hi' ? 'ठीक है' : 'OK'}

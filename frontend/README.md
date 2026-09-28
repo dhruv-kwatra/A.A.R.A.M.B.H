@@ -1,7 +1,18 @@
-# BhoomiRakshak Frontend — Bharat Convective Nowcasting Dashboard
+# BhoomiRakshak Frontend — Bharat Convective Nowcasting
 
-React + Vite + Leaflet operations dashboard for SIH26084. Dark storm-ops theme,
-built for judges' screenshots and live demos.
+React + Vite marketing site + live operations dashboard for SIH26084.
+Apple-style dark aesthetic, driven by the live nowcast API.
+
+## Routes
+
+- `#/` — marketing landing page (hero with live storm canvas, stats ticker,
+  8-metro live strip, hazard cards, pipeline, verification, data story)
+- `#/app` — full live convective operations dashboard (map, radar, districts, alerts)
+- `#/relocation` — AI-GIS disaster relocation & carrying capacity dashboard (spatial multi-hazard layers, habitations, safe camps, XAI justifications, legal certificate generation)
+
+Hash routing (`#/` / `#/app` / `#/relocation`) keeps all views working from any static server;
+`npm run build` also writes `dist/app/index.html` (postbuild) so `/app`
+returns 200 directly. The dashboard chunks (Leaflet, Recharts) are lazy-loaded.
 
 ## Quickstart
 

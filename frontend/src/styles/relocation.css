@@ -1,0 +1,297 @@
+/* BhoomiRakshak — AI-GIS Relocation & Carrying Capacity Dashboard Styles */
+
+.reloc-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--br-bg, #050507);
+  color: var(--br-text, #f5f5f7);
+  font-family: var(--br-font, system-ui, sans-serif);
+  overflow: hidden;
+}
+
+.reloc-header {
+  height: 58px;
+  background: rgba(10, 10, 16, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--br-border, rgba(255, 255, 255, 0.09));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+.reloc-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reloc-nav-pill {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--br-border);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.reloc-nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--br-muted, #86868b);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reloc-nav-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reloc-nav-btn.active {
+  background: var(--br-grad, linear-gradient(120deg, #38bdf8 0%, #818cf8 52%, #c084fc 100%));
+  color: #050507;
+  font-weight: 600;
+}
+
+.reloc-run-btn {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  transition: all 0.2s ease;
+}
+
+.reloc-run-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  transform: translateY(-1px);
+}
+
+.reloc-run-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reloc-main {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+  height: calc(100vh - 58px);
+}
+
+.reloc-left-col {
+  width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.reloc-card {
+  background: rgba(16, 16, 24, 0.75);
+  border: 1px solid var(--br-border, rgba(255, 255, 255, 0.09));
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.reloc-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.reloc-stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.reloc-stat-val {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--br-font-mono, monospace);
+}
+
+.reloc-stat-lbl {
+  font-size: 10px;
+  color: var(--br-muted, #86868b);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.reloc-matrix-wrap {
+  flex: 1;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reloc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.reloc-table th {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--br-muted, #86868b);
+  padding: 8px 10px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.reloc-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.reloc-table tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.reloc-table tr.selected {
+  background: rgba(56, 189, 248, 0.12);
+  border-left: 2px solid #38bdf8;
+}
+
+.badge-phase {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-immediate {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.badge-short {
+  background: rgba(249, 115, 22, 0.2);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+.badge-medium {
+  background: rgba(234, 179, 8, 0.2);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.reloc-right-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  position: relative;
+}
+
+.reloc-map-wrap {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--br-border, rgba(255, 255, 255, 0.09));
+  position: relative;
+}
+
+.reloc-legend {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 1000;
+  background: rgba(10, 10, 16, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--br-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 11px;
+}
+
+.reloc-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.reloc-legend-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.reloc-xai-panel {
+  background: rgba(16, 16, 24, 0.95);
+  border: 1px solid var(--br-border);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.reloc-xai-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.reloc-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.reloc-modal-box {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  width: 540px;
+  max-width: 95vw;
+  padding: 24px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+}

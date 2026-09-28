@@ -1,312 +1,62 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import Header from './components/Header.jsx';
-import StormMap from './components/StormMap.jsx';
-import DistrictPanel from './components/DistrictPanel.jsx';
-import TimeSlider from './components/TimeSlider.jsx';
-import AlertModal, { loadArmed } from './components/AlertModal.jsx';
-import Footer from './components/Footer.jsx';
-import {
-  API_URL,
-  apiFetch,
-  withRegion,
-  wsUrl,
-  addMinutesISO,
-  REGIONS_FALLBACK,
-  DEFAULT_REGION,
-} from './utils/api.js';
+import { Suspense, lazy, useEffect, useState } from 'react';
+import Landing from './pages/Landing.jsx';
+import { useHashRoute } from './router.js';
 import { STRINGS } from './utils/i18n.js';
 
-const POLL_MS = 60000;
+// Code-split: the dashboard (Leaflet) loads only when the user opens #/app,
+// keeping the landing page light.
+const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
+const RelocationDashboard = lazy(() => import('./pages/RelocationDashboard.jsx'));
 
-export default function App() {
-  const [lang, setLang] = useState('en');
-  const t = STRINGS[lang] || STRINGS.en;
-
-  const [regions, setRegions] = useState(REGIONS_FALLBACK);
-  const [regionId, setRegionId] = useState(DEFAULT_REGION);
-  const region = regions.find((r) => r.id === regionId) || regions[0];
-
-  const [online, setOnline] = useState(false);
-  const [health, setHealth] = useState(null);
-  const [cycle, setCycle] = useState(null);
-  const [hazards, setHazards] = useState(null);
-  const [radar, setRadar] = useState(null);
-  const [districts, setDistricts] = useState([]);
-  const [districtsAt, setDistrictsAt] = useState(Date.now());
-
-  const [leadMin, setLeadMin] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [toggles, setToggles] = useState({
-    lightning: true,
-    hail: true,
-    downburst: true,
-    cloudburst: true,
-    radar: true,
-    imd: false,
-    bhuvan: false,
-  });
-  const [radarOpacity, setRadarOpacity] = useState(0.65);
-  const [alertDistrict, setAlertDistrict] = useState(null);
-  const [armedMap, setArmedMap] = useState(() => loadArmed());
-
-  // Fresh values for WS / poll callbacks without stale closures.
-  const stateRef = useRef({ regionId, leadMin });
-  stateRef.current = { regionId, leadMin };
-
-  const fetchHazards = useCallback(async (region, lead) => {
-    const path =
-      lead === 0
-        ? withRegion('/api/hazards/latest', region)
-        : withRegion(`/api/forecast/${lead}`, region);
-    const data = await apiFetch(path);
-    setHazards(data);
-  }, []);
-
-  const loadAll = useCallback(
-    async (region, lead) => {
-      // Health + cycle first: they decide the online/offline banner.
-      try {
-        const [h, c] = await Promise.all([
-          apiFetch('/api/health'),
-          apiFetch(withRegion('/api/cycle', region)),
-        ]);
-        setHealth(h);
-        setCycle(c);
-        setOnline(true);
-      } catch {
-        setOnline(false);
-        return;
-      }
-      const [hz, rd, ds] = await Promise.allSettled([
-        (async () => {
-          const path =
-            lead === 0
-              ? withRegion('/api/hazards/latest', region)
-              : withRegion(`/api/forecast/${lead}`, region);
-          return apiFetch(path);
-        })(),
-        apiFetch(withRegion('/api/radar/latest', region)),
-        apiFetch(withRegion('/api/districts', region)),
-      ]);
-      if (hz.status === 'fulfilled') setHazards(hz.value);
-      if (rd.status === 'fulfilled') setRadar(rd.value);
-      if (ds.status === 'fulfilled' && Array.isArray(ds.value)) {
-        setDistricts(ds.value);
-        setDistrictsAt(Date.now());
-      }
-    },
-    [],
-  );
-
-  // Regions catalog (authoritative from backend; fallback presets otherwise).
-  useEffect(() => {
-    let cancelled = false;
-    apiFetch('/api/regions')
-      .then((list) => {
-        if (cancelled) return;
-        if (Array.isArray(list) && list.length > 0) setRegions(list);
-      })
-      .catch(() => {
-        /* keep REGIONS_FALLBACK */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Initial load + 60 s poll fallback.
-  useEffect(() => {
-    const { regionId: r, leadMin: l } = stateRef.current;
-    loadAll(r, l);
-    const id = setInterval(() => {
-      const s = stateRef.current;
-      loadAll(s.regionId, s.leadMin);
-    }, POLL_MS);
-    return () => clearInterval(id);
-  }, [loadAll]);
-
-  // Live WebSocket: refresh on every new inference cycle, reconnect on drop.
-  useEffect(() => {
-    let ws = null;
-    let retryMs = 3000;
-    let closed = false;
-    const connect = () => {
-      try {
-        ws = new WebSocket(wsUrl());
-      } catch {
-        schedule();
-        return;
-      }
-      ws.onmessage = (ev) => {
-        try {
-          const msg = JSON.parse(ev.data);
-          if (msg && msg.event === 'new_cycle') {
-            const s = stateRef.current;
-            loadAll(s.regionId, s.leadMin);
-          }
-        } catch {
-          /* ignore malformed push */
-        }
-      };
-      ws.onopen = () => {
-        retryMs = 3000;
-      };
-      ws.onclose = () => {
-        if (!closed) schedule();
-      };
-      ws.onerror = () => {
-        try {
-          ws.close();
-        } catch {
-          /* noop */
-        }
-      };
-    };
-    const schedule = () => {
-      if (closed) return;
-      setTimeout(() => {
-        if (!closed) connect();
-      }, retryMs);
-      retryMs = Math.min(retryMs * 2, 30000);
-    };
-    connect();
-    return () => {
-      closed = true;
-      try {
-        ws && ws.close();
-      } catch {
-        /* noop */
-      }
-    };
-  }, [loadAll]);
-
-  // Debounced forecast fetch when the time slider (or region) changes.
-  useEffect(() => {
-    const id = setTimeout(() => {
-      fetchHazards(regionId, leadMin).catch(() => {
-        /* keep previous polygons */
-      });
-    }, 250);
-    return () => clearTimeout(id);
-  }, [leadMin, regionId, fetchHazards]);
-
-  // Play mode: auto-advance the forecast lead.
-  useEffect(() => {
-    if (!playing) return undefined;
-    const id = setInterval(() => {
-      setLeadMin((l) => (l >= 360 ? 0 : l + 15));
-    }, 1500);
-    return () => clearInterval(id);
-  }, [playing]);
-
-  const handleRegion = (id) => {
-    if (id === regionId) return;
-    setRegionId(id);
-    setLeadMin(0);
-    setPlaying(false);
-    loadAll(id, 0);
-  };
-
-  const handleToggle = (key) => {
-    setToggles((prev) => {
-      if (key === 'bhuvan-on') return { ...prev, bhuvan: true };
-      if (key === 'bhuvan-off') return { ...prev, bhuvan: false };
-      return { ...prev, [key]: !prev[key] };
-    });
-  };
-
-  const handleAlertSaved = () => {
-    setArmedMap(loadArmed());
-  };
-
-  const armedForRegion = {};
-  districts.forEach((d) => {
-    if (armedMap[`${regionId}::${d.district}`]) armedForRegion[d.district] = true;
-  });
-
-  const validTimeISO = addMinutesISO(cycle?.valid_time, leadMin);
-  const geoKey = `${regionId}-${leadMin}-${cycle?.cycle_id ?? 'na'}-${
-    hazards?.features?.length ?? 0
-  }`;
-
+function DashboardFallback() {
   return (
-    <div className="app">
-      <Header
-        online={online}
-        health={health}
-        cycle={cycle}
-        counts={cycle?.hazard_counts}
-        regions={regions}
-        regionId={regionId}
-        onRegion={handleRegion}
-        lang={lang}
-        onLang={setLang}
-        t={t}
-      />
-
-      {!online && (
-        <div className="offline-banner">
-          ⚠️ {t.backendOffline}{' '}
-          <button
-            className="ghost-btn"
-            onClick={() => {
-              const s = stateRef.current;
-              loadAll(s.regionId, s.leadMin);
-            }}
-          >
-            {t.retry}
-          </button>
-        </div>
-      )}
-
-      <div className="main">
-        <div className="map-area">
-          <StormMap
-            region={region}
-            hazards={hazards}
-            geoKey={geoKey}
-            radar={radar}
-            radarOpacity={radarOpacity}
-            toggles={toggles}
-            onToggle={handleToggle}
-            onOpacity={setRadarOpacity}
-            lang={lang}
-            t={t}
-          />
-          <TimeSlider
-            leadMin={leadMin}
-            onChange={(v) => {
-              setPlaying(false);
-              setLeadMin(v);
-            }}
-            validTimeISO={validTimeISO}
-            playing={playing}
-            onPlayToggle={() => setPlaying((p) => !p)}
-            t={t}
-          />
-        </div>
-        <DistrictPanel
-          districts={districts}
-          fetchedAt={districtsAt}
-          lang={lang}
-          t={t}
-          armedMap={armedForRegion}
-          onArm={setAlertDistrict}
-        />
-      </div>
-
-      <Footer t={t} online={online} apiUrl={API_URL} />
-
-      {alertDistrict && (
-        <AlertModal
-          district={alertDistrict}
-          regionId={regionId}
-          lang={lang}
-          t={t}
-          onClose={() => setAlertDistrict(null)}
-          onSaved={handleAlertSaved}
-        />
-      )}
+    <div className="app" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="skel" style={{ width: 220, height: 18 }} />
     </div>
   );
+}
+
+export default function App() {
+  const route = useHashRoute();
+  const [lang, setLang] = useState(() => {
+    try {
+      return localStorage.getItem('br_lang') || 'en';
+    } catch {
+      return 'en';
+    }
+  });
+  const t = STRINGS[lang] || STRINGS.en;
+
+  // Landing scrolls; dashboard views lock to the viewport.
+  useEffect(() => {
+    document.body.classList.toggle('is-app', route === '/app' || route === '/relocation');
+    window.scrollTo(0, 0);
+  }, [route]);
+
+  const handleLang = (l) => {
+    setLang(l);
+    try {
+      localStorage.setItem('br_lang', l);
+    } catch {
+      /* noop */
+    }
+    document.documentElement.lang = l === 'hi' ? 'hi' : 'en';
+  };
+
+  if (route === '/relocation') {
+    return (
+      <Suspense fallback={<DashboardFallback />}>
+        <RelocationDashboard lang={lang} onLang={handleLang} />
+      </Suspense>
+    );
+  }
+
+  if (route === '/app') {
+    return (
+      <Suspense fallback={<DashboardFallback />}>
+        <Dashboard lang={lang} onLang={handleLang} />
+      </Suspense>
+    );
+  }
+  return <Landing t={t} lang={lang} onLang={handleLang} />;
 }

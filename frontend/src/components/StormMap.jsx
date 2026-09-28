@@ -5,10 +5,8 @@ import {
   WMSTileLayer,
   GeoJSON,
   ImageOverlay,
-  Tooltip,
   useMap,
 } from 'react-leaflet';
-import L from 'leaflet';
 import {
   INDIA_VIEW,
   INDIA_MAX_BOUNDS,
@@ -21,6 +19,7 @@ import {
   escHtml,
 } from '../utils/api.js';
 import { severityLabel } from '../utils/i18n.js';
+import { HAZARD_ICON, IconRadar, IconGlobe, IconAlert, IconLayers } from './icons.jsx';
 
 // Re-centre the map whenever the selected metro window changes.
 function Recenter({ region }) {
@@ -157,7 +156,7 @@ function Legend({ toggles, t }) {
           <span key={s} className="legend-item">
             <i
               className="legend-swatch"
-              style={{ background: SEVERITY_COLORS[s] }}
+              style={{ background: SEVERITY_COLORS[s], color: SEVERITY_COLORS[s] }}
             />
             {s}
           </span>
@@ -276,26 +275,32 @@ export default function StormMap({
       </MapContainer>
 
       <div className="layer-panel">
-        <div className="layer-panel-title">{t.layers}</div>
-        {Object.keys(HAZARD_META).map((h) => (
-          <label key={h} className="layer-toggle">
-            <input
-              type="checkbox"
-              checked={toggles[h] !== false}
-              onChange={() => onToggle(h)}
-            />
-            <span>
-              {HAZARD_META[h].icon} {hazardLabel(h, lang)}
-            </span>
-          </label>
-        ))}
+        <div className="layer-panel-title">
+          <IconLayers size={13} style={{ verticalAlign: -2, marginRight: 6 }} />
+          {t.layers}
+        </div>
+        {Object.keys(HAZARD_META).map((h) => {
+          const Icon = HAZARD_ICON[h];
+          return (
+            <label key={h} className="layer-toggle">
+              <input
+                type="checkbox"
+                checked={toggles[h] !== false}
+                onChange={() => onToggle(h)}
+              />
+              <span className="lt-ic">{Icon ? <Icon size={15} /> : HAZARD_META[h].icon}</span>
+              <span>{hazardLabel(h, lang)}</span>
+            </label>
+          );
+        })}
         <label className="layer-toggle">
           <input
             type="checkbox"
             checked={!!toggles.radar}
             onChange={() => onToggle('radar')}
           />
-          <span>📡 {t.radar}</span>
+          <span className="lt-ic"><IconRadar size={15} /></span>
+          <span>{t.radar}</span>
         </label>
         {toggles.radar && (
           <label className="opacity-row">
@@ -315,7 +320,8 @@ export default function StormMap({
             checked={!!toggles.imd}
             onChange={() => onToggle('imd')}
           />
-          <span>🛰️ {t.compare}</span>
+          <span className="lt-ic"><IconGlobe size={15} /></span>
+          <span>{t.compare}</span>
         </label>
         <div className="base-toggle">
           <span>{t.baseMap}</span>
@@ -334,7 +340,12 @@ export default function StormMap({
             </button>
           </div>
         </div>
-        {toggles.imd && <div className="imd-note">⚠️ {t.imdSimNote}</div>}
+        {toggles.imd && (
+          <div className="imd-note">
+            <IconAlert size={13} style={{ flexShrink: 0, marginTop: 1 }} />
+            <span>{t.imdSimNote}</span>
+          </div>
+        )}
       </div>
 
       <Legend toggles={toggles} t={t} />

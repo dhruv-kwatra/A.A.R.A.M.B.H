@@ -1,4 +1,4 @@
-# A.A.R.A.M.B.H (BhoomiRakshak) — Nowcasting Backend (SIH26084)
+# BhoomiRakshak — Nowcasting Backend (SIH26084)
 ### Bharat Convective Nowcasting — India-only
 
 FastAPI service implementing the convective-scale nowcasting pipeline for
@@ -67,9 +67,14 @@ production path swaps in the India-first sources above with no API change.
      window → probability = fraction of window steps exceeding
    - `polygons.py` — marching-squares contour tracing → GeoJSON with contract
      properties + `advisory_hi` (Hindi), IMD colour-code wording.
-4. **Store** (`app/store.py`) — SQLite cycle archive keyed by (region, cycle)
+4. **Relocation & Carrying Capacity Engine** (`app/relocation/`)
+   - `models.py` / `database.py` — SQLite/PostGIS schema: `hazard_zones`, `habitations`, `candidate_sites`, `red_zones`, `feedback`, `legal_certificates`.
+   - `engine.py` — GeoPandas spatial intersection overlay: computes cumulative hazard intensity, socio-demographic vulnerability factor, priority score, and greedy allocation to candidate safe camps.
+   - `pdf_gen.py` — dynamic ReportLab statutory relocation directive generation with cryptographic SHA-256 blockchain audit hash.
+   - `routes.py` — full REST API for layers, engine execution, grievances, and certificates.
+5. **Store** (`app/store.py`) — SQLite cycle archive keyed by (region, cycle)
    + per-region in-memory latest cache.
-5. **Scheduler** (`app/ingest/scheduler.py`) — asyncio loop, every
+6. **Scheduler** (`app/ingest/scheduler.py`) — asyncio loop, every
    `BH_CYCLE_INTERVAL_S` (default 300 s): all regions cycle concurrently →
    WS broadcast `{"event":"new_cycle","region":...}`.
 
@@ -88,6 +93,13 @@ Data endpoints accept `?region=<id>` (default `delhi-ncr`).
 | `GET /api/cycle` | cycle_id, valid_time, next_cycle_in_s, hazard_counts, region |
 | `GET /api/verification` | reads `../verification/results.json` if present |
 | `WS /ws/live` | pushes `new_cycle` event per region per cycle |
+| `GET /api/layers/hazards` | GeoJSON multi-hazard footprints (landslide, flood, outwash) |
+| `GET /api/layers/habitations` | GeoJSON habitations with socio-demographic vulnerability |
+| `GET /api/layers/candidate-sites` | GeoJSON candidate safe relief sites with carrying capacity |
+| `POST /api/engine/compute` | Triggers AI-GIS spatial fusion & carrying capacity allocation |
+| `GET /api/red-zones` | Prioritized habitations ranked into Immediate, Short, Medium phases with XAI justifications |
+| `POST /api/feedback` | Citizen grievance & ground status reporting |
+| `GET /api/red-zones/{id}/certificate` | Dynamic ReportLab PDF legal certificate with SHA-256 audit hash |
 
 ## Configuration (env vars)
 

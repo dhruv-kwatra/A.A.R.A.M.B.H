@@ -27,14 +27,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import DEFAULT_REGION, get_region, region_bounds, region_ids, settings
 from .ingest import scheduler
 from .store import cached_regions, get_cache
+from .relocation import database as reloc_db
+from .relocation import models as reloc_models
+from .relocation import routes as reloc_routes
+from .relocation import seed as reloc_seed
+from .relocation import engine as reloc_engine
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 VERIFICATION_JSON = Path(__file__).resolve().parents[2] / "verification" / "results.json"
 
-app = FastAPI(title="BhoomiRakshak Nowcasting API — Bharat Convective Nowcasting",
-              version="2.0.0")
+app = FastAPI(title="BhoomiRakshak Nowcasting & Relocation API — Unified Disaster Management Platform",
+              version="2.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # demo dashboard; tighten in production
@@ -42,10 +47,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(reloc_routes.router)
+
 
 @app.on_event("startup")
 async def _startup() -> None:
+    # 1. Start convective nowcasting scheduler loop
     scheduler.start()
+
+    # 2. Initialize Relocation DB schema & pre-seed
+    try:
+        reloc_models.Base.metadata.create_all(bind=reloc_db.engine)
+        with reloc_db.SessionLocal() as session:
+            reloc_seed.seed_if_empty(session)
+            reloc_engine.run_analytics_engine(session)
+        log.info("Relocation DB initialized and initial analytics cycle computed.")
+    except Exception as exc:
+        log.exception("Error initializing relocation subsystem: %s", exc)
 
 
 # ------------------------------------------------------------------ helpers

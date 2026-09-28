@@ -1,14 +1,8 @@
-import { formatIST, SEVERITY_COLORS } from '../utils/api.js';
+import { SEVERITY_COLORS } from '../utils/api.js';
 import { regionName } from '../utils/i18n.js';
-
-function StatusDot({ online }) {
-  return (
-    <span
-      className={`status-dot ${online ? 'on' : 'off'}`}
-      title={online ? 'connected' : 'disconnected'}
-    />
-  );
-}
+import { Logo, IconArrowLeft } from './icons.jsx';
+import { useISTClock } from '../hooks/useLive.js';
+import { go } from '../router.js';
 
 export default function Header({
   online,
@@ -22,13 +16,17 @@ export default function Header({
   onLang,
   t,
 }) {
+  const clock = useISTClock();
   const totalCells = counts
     ? Object.values(counts).reduce((a, b) => a + (Number(b) || 0), 0)
     : 0;
   return (
     <header className="app-header">
       <div className="brand">
-        <div className="brand-mark">🛡️</div>
+        <button className="brand-back" onClick={() => go('/')} title="BhoomiRakshak home">
+          <IconArrowLeft size={14} />
+        </button>
+        <Logo size={24} />
         <div>
           <div className="brand-title">BhoomiRakshak</div>
           <div className="brand-sub">{t.subtitle}</div>
@@ -49,6 +47,8 @@ export default function Header({
       </nav>
 
       <div className="header-right">
+        <span className="dash-clock">{clock}</span>
+
         <div className="lang-toggle" role="group" aria-label="language">
           <button
             className={lang === 'en' ? 'active' : ''}
@@ -64,8 +64,29 @@ export default function Header({
           </button>
         </div>
 
+        <button
+          onClick={() => go('/relocation')}
+          title="Switch to AI-GIS Relocation & Carrying Capacity Engine"
+          style={{
+            background: 'rgba(56, 189, 248, 0.12)',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
+            color: '#38bdf8',
+            padding: '5px 12px',
+            borderRadius: 8,
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Relocation Planning →
+        </button>
+
         <div className="status-block">
-          <StatusDot online={online} />
+          <span className={`status-dot ${online ? 'on' : 'off'}`} />
           <span className="status-text">
             {online ? t.live : t.offline}
           </span>
@@ -79,7 +100,12 @@ export default function Header({
         <div className="cycle-block" title={t.lastCycle}>
           <span className="cycle-label">{t.lastCycle}</span>
           <span className="cycle-time">
-            {formatIST(cycle?.valid_time || health?.last_cycle)}
+            {cycle?.valid_time
+              ? new Intl.DateTimeFormat('en-IN', {
+                  day: '2-digit', month: 'short', hour: '2-digit',
+                  minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata',
+                }).format(new Date(cycle.valid_time)) + ' IST'
+              : '—'}
           </span>
         </div>
 
@@ -90,7 +116,7 @@ export default function Header({
                 key={sev}
                 className="count-badge"
                 style={{
-                  background: `${SEVERITY_COLORS[sev] || '#888'}22`,
+                  background: `${SEVERITY_COLORS[sev] || '#888'}1f`,
                   borderColor: SEVERITY_COLORS[sev] || '#888',
                   color: SEVERITY_COLORS[sev] || '#888',
                 }}
