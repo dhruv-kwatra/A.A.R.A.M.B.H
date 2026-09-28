@@ -16,6 +16,22 @@
   --radius: 12px;
 }
 
+[data-theme="light"] {
+  --bg: #f8fafc;
+  --bg2: #ffffff;
+  --panel: rgba(255, 255, 255, 0.94);
+  --panel-solid: #ffffff;
+  --border: rgba(148, 163, 184, 0.28);
+  --text: #0f172a;
+  --muted: #64748b;
+  --accent: #0284c7;
+  --accent2: #6366f1;
+  --yellow: #ca8a04;
+  --orange: #ea580c;
+  --red: #dc2626;
+  --green: #16a34a;
+}
+
 * { box-sizing: border-box; }
 
 html, body, #root {
@@ -105,6 +121,31 @@ html, body, #root {
   cursor: pointer;
 }
 .lang-toggle button.active { background: rgba(129, 140, 248, 0.25); color: #fff; font-weight: 700; }
+
+.theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 5px 9px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--accent);
+}
+[data-theme="light"] .theme-toggle-btn {
+  background: rgba(15, 23, 42, 0.05);
+}
+[data-theme="light"] .theme-toggle-btn:hover {
+  background: rgba(15, 23, 42, 0.1);
+}
 
 .status-block { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; }
 .status-dot { width: 10px; height: 10px; border-radius: 50%; }

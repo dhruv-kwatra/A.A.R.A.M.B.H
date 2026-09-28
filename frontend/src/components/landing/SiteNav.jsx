@@ -4,7 +4,7 @@ import { go } from '../../router.js';
 import { useISTClock } from '../../hooks/useLive.js';
 
 /** Glassy sticky nav: logo, section links, live IST clock, lang toggle, CTA. */
-export function SiteNav({ t, lang, onLang, online }) {
+export function SiteNav({ t, lang, onLang, online, theme = 'dark', onToggleTheme }) {
   const clock = useISTClock();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -44,6 +44,16 @@ export function SiteNav({ t, lang, onLang, online }) {
             <button className={lang === 'en' ? 'active' : ''} onClick={() => onLang('en')}>EN</button>
             <button className={lang === 'hi' ? 'active' : ''} onClick={() => onLang('hi')}>हिंदी</button>
           </div>
+          {onToggleTheme && (
+            <button
+              className="theme-toggle-btn"
+              onClick={onToggleTheme}
+              title={theme === 'light' ? 'Switch to Dark mode' : 'Switch to Light mode'}
+              aria-label="Toggle light or dark theme"
+            >
+              {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+            </button>
+          )}
           <button className="btn btn-ghost btn-sm" onClick={() => go('/relocation')} style={{ borderColor: 'rgba(56, 189, 248, 0.4)', color: '#38bdf8' }}>
             Relocation Engine
           </button>
@@ -92,6 +102,17 @@ export function SiteNav({ t, lang, onLang, online }) {
               <button className={lang === 'en' ? 'active' : ''} onClick={() => onLang('en')}>EN</button>
               <button className={lang === 'hi' ? 'active' : ''} onClick={() => onLang('hi')}>हिंदी</button>
             </div>
+
+            {onToggleTheme && (
+              <button
+                className="theme-toggle-btn"
+                onClick={onToggleTheme}
+                style={{ padding: '6px 12px' }}
+                title={theme === 'light' ? 'Switch to Dark mode' : 'Switch to Light mode'}
+              >
+                {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+              </button>
+            )}
           </div>
 
           <div className="mobile-drawer-buttons">

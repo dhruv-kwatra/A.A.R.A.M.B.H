@@ -56,6 +56,46 @@
   --dur: 0.45s;
 }
 
+/* ---- LIGHT ATMOSPHERIC GLASS DESIGN SYSTEM ---- */
+[data-theme="light"] {
+  /* Crisp daylight atmosphere with clean slate undertones */
+  --br-bg: #f8fafc;
+  --br-bg-2: #ffffff;
+  --br-bg-3: #f1f5f9;
+  --br-text: #0f172a;
+  --br-muted: #64748b;
+  --br-muted-2: #334155;
+
+  /* Frosted light glassmorphism */
+  --br-card: rgba(255, 255, 255, 0.86);
+  --br-card-2: rgba(248, 250, 252, 0.96);
+  --br-border: rgba(15, 23, 42, 0.09);
+  --br-border-2: rgba(2, 132, 199, 0.42);
+  --br-glass: rgba(255, 255, 255, 0.84);
+  --br-glass-blur: blur(24px) saturate(180%);
+  --br-glass-border-top: rgba(255, 255, 255, 1);
+  --br-glass-shadow: 0 14px 34px -8px rgba(15, 23, 42, 0.07), inset 0 1px 1px 0 rgba(255, 255, 255, 1), inset 0 -1px 1px 0 rgba(15, 23, 42, 0.03);
+  --br-glass-shadow-hover: 0 20px 48px -6px rgba(15, 23, 42, 0.13), 0 0 24px rgba(2, 132, 199, 0.16), inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1);
+  --br-rain-tint: rgba(186, 230, 253, 0.22);
+
+  /* Electric daylight accents */
+  --br-accent: #0284c7;
+  --br-accent-2: #2563eb;
+  --br-accent-3: #7c3aed;
+  --br-grad: linear-gradient(135deg, #0284c7 0%, #2563eb 40%, #6366f1 70%, #9333ea 100%);
+  --br-grad-soft: linear-gradient(135deg, rgba(2,132,199,.14), rgba(37,99,235,.11), rgba(124,58,237,.11));
+
+  /* IMD severity in daylight contrast */
+  --br-yellow: #ca8a04;
+  --br-orange: #ea580c;
+  --br-red: #dc2626;
+  --br-green: #16a34a;
+
+  /* Shadows for light mode depth */
+  --sh-1: 0 10px 30px rgba(15, 23, 42, 0.06);
+  --sh-2: 0 24px 60px rgba(15, 23, 42, 0.1);
+}
+
 * { box-sizing: border-box; }
 
 html {

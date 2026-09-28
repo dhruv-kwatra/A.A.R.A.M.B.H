@@ -25,7 +25,28 @@ export default function App() {
       return 'en';
     }
   });
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem('br_theme') || 'dark';
+    } catch {
+      return 'dark';
+    }
+  });
   const t = STRINGS[lang] || STRINGS.en;
+
+  // Set theme attribute on root and persist
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('br_theme', theme);
+    } catch {
+      /* noop */
+    }
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   // Landing scrolls; dashboard views lock to the viewport.
   useEffect(() => {
@@ -46,7 +67,12 @@ export default function App() {
   if (route === '/relocation') {
     return (
       <Suspense fallback={<DashboardFallback />}>
-        <RelocationDashboard lang={lang} onLang={handleLang} />
+        <RelocationDashboard
+          lang={lang}
+          onLang={handleLang}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
+        />
       </Suspense>
     );
   }
@@ -54,9 +80,22 @@ export default function App() {
   if (route === '/app') {
     return (
       <Suspense fallback={<DashboardFallback />}>
-        <Dashboard lang={lang} onLang={handleLang} />
+        <Dashboard
+          lang={lang}
+          onLang={handleLang}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
+        />
       </Suspense>
     );
   }
-  return <Landing t={t} lang={lang} onLang={handleLang} />;
+  return (
+    <Landing
+      t={t}
+      lang={lang}
+      onLang={handleLang}
+      theme={theme}
+      onToggleTheme={handleToggleTheme}
+    />
+  );
 }

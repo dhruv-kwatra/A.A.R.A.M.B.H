@@ -90,7 +90,7 @@ class RainAudioSynthesizer {
  * - Dynamic lightning flashes illuminating the scene
  * - Weather controls (Intensity: Drizzle / Monsoon / Cloudburst, Lightning on/off, Ambient Audio)
  */
-export default function RainScene3D({ mode = 'background' }) {
+export default function RainScene3D({ mode = 'background', theme = 'dark' }) {
   const containerRef = useRef(null);
   const glassCanvasRef = useRef(null);
   const audioSynthRef = useRef(null);
@@ -196,12 +196,13 @@ export default function RainScene3D({ mode = 'background' }) {
 
     dropGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-    // Custom shader material for soft glowing raindrops
+    // Custom material for raindrops with dark/light mode tuning
+    const isLight = theme === 'light';
     const dropMaterial = new THREE.LineBasicMaterial({
-      color: 0x86b0d9,
+      color: isLight ? 0x2563eb : 0x86b0d9,
       transparent: true,
-      opacity: 0.55,
-      blending: THREE.AdditiveBlending,
+      opacity: isLight ? 0.35 : 0.55,
+      blending: isLight ? THREE.NormalBlending : THREE.AdditiveBlending,
     });
 
     const rainLines = new THREE.LineSegments(dropGeometry, dropMaterial);
@@ -233,10 +234,10 @@ export default function RainScene3D({ mode = 'background' }) {
     bigDropGeometry.setAttribute('position', new THREE.BufferAttribute(bigPositions, 3));
 
     const bigDropMaterial = new THREE.LineBasicMaterial({
-      color: 0xe0f2fe,
+      color: isLight ? 0x0284c7 : 0xe0f2fe,
       transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending,
+      opacity: isLight ? 0.55 : 0.85,
+      blending: isLight ? THREE.NormalBlending : THREE.AdditiveBlending,
     });
     const bigRainLines = new THREE.LineSegments(bigDropGeometry, bigDropMaterial);
     scene.add(bigRainLines);

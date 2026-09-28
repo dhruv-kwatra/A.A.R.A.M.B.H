@@ -5,12 +5,19 @@ import { useNowcastLive } from '../hooks/useLive.js';
 import RainScene3D from '../components/3d/RainScene3D.jsx';
 
 /** Marketing landing page — Apple-style, driven by live API data. */
-export default function Landing({ t, lang, onLang }) {
+export default function Landing({ t, lang, onLang, theme = 'dark', onToggleTheme }) {
   const live = useNowcastLive();
   return (
     <div className="site">
-      <RainScene3D />
-      <SiteNav t={t} lang={lang} onLang={onLang} online={live.online} />
+      <RainScene3D theme={theme} />
+      <SiteNav
+        t={t}
+        lang={lang}
+        onLang={onLang}
+        online={live.online}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
+      />
       <main>
         <Hero t={t} live={live} />
         <Ticker t={t} live={live} />

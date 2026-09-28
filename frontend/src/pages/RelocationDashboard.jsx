@@ -72,7 +72,7 @@ const BASEMAP_PRESETS = {
   },
 };
 
-export default function RelocationDashboard({ lang = 'en', onLang }) {
+export default function RelocationDashboard({ lang = 'en', onLang, theme = 'dark', onToggleTheme }) {
   const [layers, setLayers] = useState({ hazards: null, habitations: null, sites: null });
   const [redZones, setRedZones] = useState([]);
   const [selectedZone, setSelectedZone] = useState(null);
@@ -256,7 +256,17 @@ export default function RelocationDashboard({ lang = 'en', onLang }) {
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {onToggleTheme && (
+            <button
+              className="theme-toggle-btn"
+              onClick={onToggleTheme}
+              title={theme === 'light' ? 'Switch to Dark mode' : 'Switch to Light mode'}
+              aria-label="Toggle theme"
+            >
+              {theme === 'light' ? '🌙' : '☀️'}
+            </button>
+          )}
           <button
             className="reloc-run-btn"
             onClick={handleCompute}

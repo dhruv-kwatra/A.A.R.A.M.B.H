@@ -956,3 +956,265 @@
   .hero-foot { gap: var(--sp-3); }
   .nav-inner { padding: 0 14px; }
 }
+
+/* ========================================================
+   LIGHT THEME OVERRIDES FOR LANDING PAGE
+   ======================================================== */
+[data-theme="light"] body {
+  background: var(--br-bg);
+  color: var(--br-text);
+}
+
+[data-theme="light"] .site {
+  background: var(--br-bg);
+}
+
+/* Nav */
+[data-theme="light"] .site-nav {
+  background: rgba(255, 255, 255, 0.88);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="light"] .nav-brand {
+  color: #0f172a;
+}
+
+[data-theme="light"] .nav-links a {
+  color: #475569;
+}
+
+[data-theme="light"] .nav-links a:hover {
+  color: #0284c7;
+  background: rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="light"] .nav-clock {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.1);
+  color: #475569;
+}
+
+[data-theme="light"] .nav-lang {
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+[data-theme="light"] .nav-lang button {
+  color: #64748b;
+}
+
+[data-theme="light"] .nav-lang button.active {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+[data-theme="light"] .theme-toggle-btn {
+  background: rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  color: #0f172a;
+}
+
+[data-theme="light"] .theme-toggle-btn:hover {
+  background: rgba(15, 23, 42, 0.1);
+  border-color: #0284c7;
+}
+
+/* Hero Section */
+[data-theme="light"] .hero-kicker {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  color: #334155;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="light"] .hero-kicker strong {
+  color: #0284c7 !important;
+}
+
+[data-theme="light"] .hero .sub {
+  color: #475569;
+}
+
+[data-theme="light"] .hero-visual {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-top: 1px solid rgba(15, 23, 42, 0.2);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="light"] .hero-hud {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #475569;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+[data-theme="light"] .hero-foot {
+  background: rgba(255, 255, 255, 0.92);
+  border-top: 1px solid rgba(15, 23, 42, 0.1);
+  color: #475569;
+}
+
+[data-theme="light"] .hero-map-basemap-toggle {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] .hero-map-btn {
+  color: #475569;
+}
+
+[data-theme="light"] .hero-map-btn:hover {
+  color: #0f172a;
+}
+
+[data-theme="light"] .hero-map-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+/* Ticker */
+[data-theme="light"] .ticker {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .ticker-item {
+  color: #475569;
+}
+
+/* Live Strip / Region Cards */
+[data-theme="light"] .region-card {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="light"] .region-card:hover {
+  background: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 14px 34px rgba(2, 132, 199, 0.12);
+}
+
+[data-theme="light"] .rc-name {
+  color: #0f172a;
+}
+
+[data-theme="light"] .rc-cells {
+  color: #0f172a;
+}
+
+[data-theme="light"] .rc-meta {
+  color: #64748b;
+}
+
+/* Cards (Hazard, How, Verification, Story) */
+[data-theme="light"] .hazard-card,
+[data-theme="light"] .pipe-step,
+[data-theme="light"] .verif-card,
+[data-theme="light"] .data-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-top: 1px solid rgba(15, 23, 42, 0.16);
+  color: #0f172a;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="light"] .hazard-card:hover,
+[data-theme="light"] .verif-card:hover,
+[data-theme="light"] .data-card:hover {
+  background: #ffffff;
+  border-color: rgba(2, 132, 199, 0.35);
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.09);
+}
+
+[data-theme="light"] .hazard-card p,
+[data-theme="light"] .pipe-step p,
+[data-theme="light"] .data-card p {
+  color: #475569;
+}
+
+[data-theme="light"] .vs-row .vs-label span {
+  color: #64748b;
+}
+
+[data-theme="light"] .vs-bar {
+  background: rgba(15, 23, 42, 0.08);
+}
+
+/* Coverage Showcase Section */
+[data-theme="light"] .coverage-map-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-top: 1px solid rgba(15, 23, 42, 0.2);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08), inset 0 1px 1px rgba(255, 255, 255, 1);
+}
+
+[data-theme="light"] .coverage-map-head {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .cov-badge {
+  color: #0f172a;
+}
+
+[data-theme="light"] .cov-sub {
+  color: #64748b;
+}
+
+[data-theme="light"] .cov-btn {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.12);
+  color: #334155;
+}
+
+[data-theme="light"] .cov-btn:hover {
+  background: rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+}
+
+[data-theme="light"] .cov-btn.active {
+  background: rgba(2, 132, 199, 0.15);
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+[data-theme="light"] .coverage-map-legend {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  color: #475569;
+}
+
+[data-theme="light"] .metro-row {
+  color: #0f172a;
+}
+
+[data-theme="light"] .metro-row:hover {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] .metro-row.active {
+  background: rgba(2, 132, 199, 0.1) !important;
+  border-color: rgba(2, 132, 199, 0.35) !important;
+}
+
+[data-theme="light"] .site-footer {
+  background: rgba(241, 245, 249, 0.95);
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  color: #475569;
+}
+
+[data-theme="light"] .foot-brand {
+  color: #0f172a;
+}
+
+[data-theme="light"] .foot-col a {
+  color: #475569;
+}
+
+[data-theme="light"] .foot-col a:hover {
+  color: #0284c7;
+}

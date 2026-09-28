@@ -15,6 +15,8 @@ export default function Header({
   lang,
   onLang,
   t,
+  theme = 'dark',
+  onToggleTheme,
 }) {
   const clock = useISTClock();
   const totalCells = counts
@@ -63,6 +65,17 @@ export default function Header({
             हिंदी
           </button>
         </div>
+
+        {onToggleTheme && (
+          <button
+            className="theme-toggle-btn"
+            onClick={onToggleTheme}
+            title={theme === 'light' ? 'Switch to Dark mode' : 'Switch to Light mode'}
+            aria-label="Toggle theme"
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+        )}
 
         <button
           onClick={() => go('/relocation')}

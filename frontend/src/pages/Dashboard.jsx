@@ -18,7 +18,7 @@ import { STRINGS } from '../utils/i18n.js';
 
 const POLL_MS = 60000;
 
-export default function Dashboard({ lang, onLang }) {
+export default function Dashboard({ lang, onLang, theme = 'dark', onToggleTheme }) {
   const t = STRINGS[lang] || STRINGS.en;
 
   const [regions, setRegions] = useState(REGIONS_FALLBACK);
@@ -260,6 +260,8 @@ export default function Dashboard({ lang, onLang }) {
         lang={lang}
         onLang={onLang}
         t={t}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
       />
 
       {!online && !initialLoading && (
