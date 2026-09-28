@@ -1,23 +1,8 @@
 import { useState } from 'react';
 import { IconBell, IconCheck } from './icons.jsx';
+import { loadArmed, saveArmed } from '../utils/alerts.js';
 
-const LS_KEY = 'bhoomirakshak_alerts_v1';
-
-export function loadArmed() {
-  try {
-    return JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-  } catch {
-    return {};
-  }
-}
-
-export function saveArmed(map) {
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(map));
-  } catch {
-    /* storage unavailable — alert state stays in memory */
-  }
-}
+export { loadArmed, saveArmed };
 
 export default function AlertModal({ district, regionId, lang, t, onClose, onSaved }) {
   const [name, setName] = useState('');

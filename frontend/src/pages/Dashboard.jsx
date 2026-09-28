@@ -3,7 +3,8 @@ import Header from '../components/Header.jsx';
 import StormMap from '../components/StormMap.jsx';
 import DistrictPanel from '../components/DistrictPanel.jsx';
 import TimeSlider from '../components/TimeSlider.jsx';
-import AlertModal, { loadArmed } from '../components/AlertModal.jsx';
+import AlertModal from '../components/AlertModal.jsx';
+import { loadArmed } from '../utils/alerts.js';
 import Footer from '../components/Footer.jsx';
 import {
   API_URL,
