@@ -2,12 +2,14 @@ import { Hero, Ticker, LiveStrip } from '../components/landing/Hero.jsx';
 import { HazardCards, HowItWorks, Regions, Verification, DataStory, Closing } from '../components/landing/Sections.jsx';
 import { SiteNav, SiteFooter } from '../components/landing/SiteNav.jsx';
 import { useNowcastLive } from '../hooks/useLive.js';
+import RainScene3D from '../components/3d/RainScene3D.jsx';
 
 /** Marketing landing page — Apple-style, driven by live API data. */
 export default function Landing({ t, lang, onLang }) {
   const live = useNowcastLive();
   return (
     <div className="site">
+      <RainScene3D />
       <SiteNav t={t} lang={lang} onLang={onLang} online={live.online} />
       <main>
         <Hero t={t} live={live} />
