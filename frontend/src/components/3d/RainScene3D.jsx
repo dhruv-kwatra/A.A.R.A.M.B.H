@@ -96,6 +96,7 @@ export default function RainScene3D({ mode = 'background' }) {
   const audioSynthRef = useRef(null);
 
   const [intensity, setIntensity] = useState('monsoon'); // 'drizzle' | 'monsoon' | 'cloudburst'
+  const [dropSize, setDropSize] = useState('huge'); // 'standard' | 'large' | 'huge'
   const [lightningEnabled, setLightningEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -206,6 +207,40 @@ export default function RainScene3D({ mode = 'background' }) {
     const rainLines = new THREE.LineSegments(dropGeometry, dropMaterial);
     scene.add(rainLines);
 
+    // Dedicated Big 3D Foreground Drops System
+    const bigDropCount = dropSize === 'huge' ? 260 : dropSize === 'large' ? 160 : 60;
+    const bigDropGeometry = new THREE.BufferGeometry();
+    const bigPositions = new Float32Array(bigDropCount * 6);
+    const bigVelocities = new Float32Array(bigDropCount);
+
+    for (let i = 0; i < bigDropCount; i++) {
+      const x = (Math.random() - 0.5) * 360;
+      const y = Math.random() * 320 - 160;
+      const z = 35 + Math.random() * 65; // Closer to camera viewport
+      const len = 22 + Math.random() * 26; // Prominent large streak length
+
+      const idx = i * 6;
+      bigPositions[idx] = x;
+      bigPositions[idx + 1] = y;
+      bigPositions[idx + 2] = z;
+
+      bigPositions[idx + 3] = x - 1.2;
+      bigPositions[idx + 4] = y - len;
+      bigPositions[idx + 5] = z;
+
+      bigVelocities[i] = 4.2 + Math.random() * 4.2;
+    }
+    bigDropGeometry.setAttribute('position', new THREE.BufferAttribute(bigPositions, 3));
+
+    const bigDropMaterial = new THREE.LineBasicMaterial({
+      color: 0xe0f2fe,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+    });
+    const bigRainLines = new THREE.LineSegments(bigDropGeometry, bigDropMaterial);
+    scene.add(bigRainLines);
+
     // Mouse Parallax
     let mouseX = 0;
     let mouseY = 0;
@@ -237,7 +272,7 @@ export default function RainScene3D({ mode = 'background' }) {
       camera.position.y += (targetCameraY - camera.position.y) * 0.04;
       camera.lookAt(0, 0, 0);
 
-      // Animate falling rain streaks
+      // Animate background rain streaks
       const pos = dropGeometry.attributes.position.array;
       for (let i = 0; i < count; i++) {
         const v = velocities[i] * speedMult;
@@ -257,6 +292,25 @@ export default function RainScene3D({ mode = 'background' }) {
       }
       dropGeometry.attributes.position.needsUpdate = true;
 
+      // Animate big 3D foreground raindrops
+      const bPos = bigDropGeometry.attributes.position.array;
+      for (let i = 0; i < bigDropCount; i++) {
+        const bv = bigVelocities[i] * speedMult * 1.25;
+        const bIdx = i * 6;
+        bPos[bIdx + 1] -= bv;
+        bPos[bIdx + 4] -= bv;
+        bPos[bIdx] -= 0.22 * speedMult;
+        bPos[bIdx + 3] -= 0.22 * speedMult;
+
+        if (bPos[bIdx + 1] < -180) {
+          bPos[bIdx + 1] = 210;
+          bPos[bIdx + 4] = 210 - (22 + Math.random() * 26);
+          bPos[bIdx] = (Math.random() - 0.5) * 360;
+          bPos[bIdx + 3] = bPos[bIdx] - 1.2;
+        }
+      }
+      bigDropGeometry.attributes.position.needsUpdate = true;
+
       // Lightning Logic
       if (lightningEnabled) {
         lightningTimer++;
@@ -267,6 +321,7 @@ export default function RainScene3D({ mode = 'background' }) {
             lightningLight.position.x = (Math.random() - 0.5) * 200;
             dropMaterial.opacity = 0.95;
             dropMaterial.color.setHex(0xe0f2fe);
+            bigDropMaterial.opacity = 1.0;
           } else if (flashStep === 3) {
             lightningLight.intensity = 0.5;
           } else if (flashStep === 5) {
@@ -276,6 +331,7 @@ export default function RainScene3D({ mode = 'background' }) {
             lightningLight.intensity = 0;
             dropMaterial.opacity = 0.55;
             dropMaterial.color.setHex(0x86b0d9);
+            bigDropMaterial.opacity = 0.85;
             lightningTimer = 0;
             flashStep = 0;
             nextFlashInterval = 280 + Math.random() * 600;
@@ -307,8 +363,10 @@ export default function RainScene3D({ mode = 'background' }) {
       renderer.dispose();
       dropGeometry.dispose();
       dropMaterial.dispose();
+      bigDropGeometry.dispose();
+      bigDropMaterial.dispose();
     };
-  }, [intensity, lightningEnabled]);
+  }, [intensity, lightningEnabled, dropSize]);
 
   /* =========================================================================
      2. FOREGROUND GLASS RAINDROPS & SLIDING RIVULETS (MATCHING USER IMAGE)
@@ -322,13 +380,9 @@ export default function RainScene3D({ mode = 'background' }) {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Droplets on the glass window
+    // 1. Static Clinging Droplets (from reference image)
     const staticDrops = [];
-    const rivulets = []; // Droplets that slide down vertically leaving wet trails
-
-    const dropDensity = intensity === 'drizzle' ? 65 : intensity === 'monsoon' ? 140 : 240;
-
-    // Create initial glass raindrops
+    const dropDensity = intensity === 'drizzle' ? 60 : intensity === 'monsoon' ? 120 : 180;
     for (let i = 0; i < dropDensity; i++) {
       staticDrops.push({
         x: Math.random() * width,
@@ -339,17 +393,46 @@ export default function RainScene3D({ mode = 'background' }) {
       });
     }
 
-    // Create sliding rivulets (the prominent vertical trickle lines in user's photo)
-    const rivuletCount = intensity === 'drizzle' ? 3 : intensity === 'monsoon' ? 8 : 15;
+    // 2. Sliding Rivulets (vertical trickles)
+    const rivulets = [];
+    const rivuletCount = intensity === 'drizzle' ? 3 : intensity === 'monsoon' ? 7 : 12;
     for (let i = 0; i < rivuletCount; i++) {
       rivulets.push({
         x: (width / (rivuletCount + 1)) * (i + 1) + (Math.random() - 0.5) * 60,
         y: Math.random() * (height * 0.4),
         r: 3.5 + Math.random() * 3.5,
         speed: 0.8 + Math.random() * 1.8,
-        path: [], // Trail points
+        path: [],
         maxPath: 45 + Math.floor(Math.random() * 30),
       });
+    }
+
+    // 3. SINGLE BIG FALLING DROPS (Physical heavy teardrop raindrops)
+    const bigDropCount = dropSize === 'huge' ? 22 : dropSize === 'large' ? 14 : 7;
+    const fallingBigDrops = [];
+
+    const resetBigDrop = (d, initial = false) => {
+      d.x = 40 + Math.random() * (width - 80);
+      d.y = initial ? (Math.random() * -height * 1.4) : (-50 - Math.random() * 120);
+      const scale = dropSize === 'huge' ? 1.5 : dropSize === 'large' ? 1.1 : 0.8;
+      // Big big radius: 15px to 38px!
+      d.r = (14 + Math.random() * 14) * scale;
+      d.vy = 1.0 + Math.random() * 1.5;
+      d.targetVy = 4.2 + Math.random() * 5.8;
+      d.accel = 0.09 + Math.random() * 0.14;
+      d.trail = [];
+      d.maxTrail = 32 + Math.floor(Math.random() * 20);
+      d.pauseTimer = Math.random() < 0.35 ? Math.floor(15 + Math.random() * 35) : 0;
+      d.wobble = Math.random() * Math.PI * 2;
+      d.wobbleSpeed = 0.06 + Math.random() * 0.08;
+    };
+
+    for (let i = 0; i < bigDropCount; i++) {
+      const drop = {};
+      resetBigDrop(drop, true);
+      // Stagger delays so drops fall single single across time
+      drop.delay = i * 26 + Math.floor(Math.random() * 20);
+      fallingBigDrops.push(drop);
     }
 
     let animId;
@@ -358,12 +441,10 @@ export default function RainScene3D({ mode = 'background' }) {
       animId = requestAnimationFrame(renderGlass);
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Draw sliding rivulet trails (wet tracks on glass)
+      // A. Draw sliding rivulet trails
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-
       rivulets.forEach((riv) => {
-        // Move down with gentle meandering
         riv.y += riv.speed;
         riv.x += (Math.random() - 0.5) * 0.4;
         riv.path.push({ x: riv.x, y: riv.y, r: riv.r });
@@ -371,7 +452,6 @@ export default function RainScene3D({ mode = 'background' }) {
           riv.path.shift();
         }
 
-        // Draw wet streak path
         if (riv.path.length > 2) {
           ctx.beginPath();
           ctx.moveTo(riv.path[0].x, riv.path[0].y);
@@ -382,16 +462,13 @@ export default function RainScene3D({ mode = 'background' }) {
           ctx.lineWidth = riv.r * 0.8;
           ctx.stroke();
 
-          // Inner water trail highlight
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
           ctx.lineWidth = riv.r * 0.3;
           ctx.stroke();
         }
 
-        // Leading sliding droplet bead
         ctx.beginPath();
         ctx.arc(riv.x, riv.y, riv.r, 0, Math.PI * 2);
-        // Base droplet refraction gradient
         const dropGrad = ctx.createRadialGradient(
           riv.x - riv.r * 0.3, riv.y - riv.r * 0.3, riv.r * 0.1,
           riv.x, riv.y, riv.r
@@ -403,20 +480,11 @@ export default function RainScene3D({ mode = 'background' }) {
         ctx.fillStyle = dropGrad;
         ctx.fill();
 
-        // Droplet specular glint
         ctx.beginPath();
         ctx.arc(riv.x - riv.r * 0.25, riv.y - riv.r * 0.35, riv.r * 0.3, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
         ctx.fill();
 
-        // Bottom refraction shadow
-        ctx.beginPath();
-        ctx.arc(riv.x, riv.y + riv.r * 0.3, riv.r * 0.6, 0, Math.PI);
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        // Reset rivulet if it falls below screen
         if (riv.y > height + 50) {
           riv.y = -20;
           riv.x = Math.random() * width;
@@ -425,12 +493,10 @@ export default function RainScene3D({ mode = 'background' }) {
         }
       });
 
-      // 2. Draw static clinging droplets (realistic beads on glass from photo)
+      // B. Draw static clinging droplets
       staticDrops.forEach((d) => {
-        // Draw drop body
         ctx.beginPath();
         ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-
         const g = ctx.createRadialGradient(
           d.x - d.r * 0.3, d.y - d.r * 0.35, d.r * 0.08,
           d.x, d.y, d.r
@@ -439,31 +505,135 @@ export default function RainScene3D({ mode = 'background' }) {
         g.addColorStop(0.35, 'rgba(150, 185, 220, 0.35)');
         g.addColorStop(0.85, 'rgba(15, 28, 48, 0.65)');
         g.addColorStop(1, 'rgba(4, 9, 18, 0.85)');
-
         ctx.fillStyle = g;
         ctx.fill();
 
-        // Top specular glint (white crescent)
         ctx.beginPath();
         ctx.arc(d.x - d.r * 0.28, d.y - d.r * 0.32, d.r * 0.28, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.fill();
-
-        // Subtle dark rim shadow for realistic depth
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(10, 20, 35, 0.4)';
-        ctx.lineWidth = 0.6;
-        ctx.stroke();
       });
 
-      // Periodic new droplet landing on glass
-      if (Math.random() < (intensity === 'drizzle' ? 0.05 : 0.18)) {
-        const randIdx = Math.floor(Math.random() * staticDrops.length);
-        staticDrops[randIdx].x = Math.random() * width;
-        staticDrops[randIdx].y = Math.random() * height;
-        staticDrops[randIdx].r = 1.2 + Math.random() * 4.2;
-      }
+      // C. RENDER SINGLE BIG FALLING DROPS (Bold, physical teardrops)
+      fallingBigDrops.forEach((d) => {
+        if (d.delay > 0) {
+          d.delay--;
+          return;
+        }
+
+        // Slip-and-stick surface tension physics
+        if (d.pauseTimer > 0) {
+          d.pauseTimer--;
+          d.vy = Math.max(0.4, d.vy * 0.9);
+        } else {
+          d.vy += d.accel;
+          if (d.vy > d.targetVy) d.vy = d.targetVy;
+          if (Math.random() < 0.009 && d.y > 80 && d.y < height - 100) {
+            d.pauseTimer = Math.floor(18 + Math.random() * 30);
+          }
+        }
+
+        d.wobble += d.wobbleSpeed;
+        d.x += Math.sin(d.wobble) * 0.45;
+        d.y += d.vy;
+
+        d.trail.push({ x: d.x, y: d.y, r: d.r });
+        if (d.trail.length > d.maxTrail) {
+          d.trail.shift();
+        }
+
+        // 1. Wet Trail behind the big drop
+        if (d.trail.length > 2) {
+          ctx.beginPath();
+          ctx.moveTo(d.trail[0].x, d.trail[0].y);
+          for (let p = 1; p < d.trail.length; p++) {
+            ctx.lineTo(d.trail[p].x, d.trail[p].y);
+          }
+          ctx.strokeStyle = 'rgba(175, 210, 245, 0.22)';
+          ctx.lineWidth = d.r * 0.85;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+          ctx.lineWidth = d.r * 0.32;
+          ctx.stroke();
+
+          for (let p = 0; p < d.trail.length; p += 7) {
+            const pt = d.trail[p];
+            ctx.beginPath();
+            ctx.arc(pt.x + (Math.sin(p) * 2), pt.y, d.r * 0.22, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(235, 245, 255, 0.6)';
+            ctx.fill();
+          }
+        }
+
+        // 2. The Big Drop (Teardrop shape)
+        const stretch = Math.min(2.4, 1 + d.vy * 0.15);
+        const rx = d.r * (1 / Math.sqrt(stretch));
+        const ry = d.r * stretch;
+
+        ctx.save();
+        ctx.translate(d.x, d.y);
+
+        // Soft contact drop shadow
+        ctx.beginPath();
+        ctx.ellipse(2, ry * 0.22, rx * 1.1, ry * 1.05, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.fill();
+
+        // Teardrop path: tapered top apex, rounded bulbous bottom
+        ctx.beginPath();
+        ctx.moveTo(0, -ry * 0.95);
+        ctx.bezierCurveTo(-rx * 0.55, -ry * 0.45, -rx * 1.05, ry * 0.2, -rx, ry * 0.55);
+        ctx.bezierCurveTo(-rx * 0.95, ry * 1.05, rx * 0.95, ry * 1.05, rx, ry * 0.55);
+        ctx.bezierCurveTo(rx * 1.05, ry * 0.2, rx * 0.55, -ry * 0.45, 0, -ry * 0.95);
+        ctx.closePath();
+
+        // Fluid refraction gradient
+        const dropGrad = ctx.createRadialGradient(
+          -rx * 0.3, -ry * 0.25, rx * 0.08,
+          0, ry * 0.15, ry * 1.1
+        );
+        dropGrad.addColorStop(0, 'rgba(255, 255, 255, 0.94)');
+        dropGrad.addColorStop(0.22, 'rgba(205, 235, 255, 0.65)');
+        dropGrad.addColorStop(0.65, 'rgba(30, 65, 115, 0.6)');
+        dropGrad.addColorStop(0.9, 'rgba(10, 22, 45, 0.85)');
+        dropGrad.addColorStop(1, 'rgba(4, 10, 24, 0.95)');
+        ctx.fillStyle = dropGrad;
+        ctx.fill();
+
+        // Meniscus contour
+        ctx.strokeStyle = 'rgba(10, 20, 42, 0.9)';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        // Primary specular glint (bright white glare)
+        ctx.beginPath();
+        ctx.ellipse(-rx * 0.32, -ry * 0.28, rx * 0.32, ry * 0.2, -Math.PI / 6, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.fill();
+
+        // Apex glint
+        ctx.beginPath();
+        ctx.arc(-rx * 0.08, -ry * 0.55, rx * 0.14, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+        ctx.fill();
+
+        // Bottom internal reflection crescent
+        ctx.beginPath();
+        ctx.ellipse(0, ry * 0.72, rx * 0.65, ry * 0.2, 0, 0, Math.PI);
+        ctx.strokeStyle = 'rgba(190, 230, 255, 0.75)';
+        ctx.lineWidth = 2.0;
+        ctx.stroke();
+
+        ctx.restore();
+
+        // Reset if off-screen
+        if (d.y > height + 80) {
+          resetBigDrop(d, false);
+          d.delay = Math.floor(12 + Math.random() * 50); // Staggered delay for single single falling!
+        }
+      });
     };
     renderGlass();
 
@@ -477,7 +647,7 @@ export default function RainScene3D({ mode = 'background' }) {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
     };
-  }, [intensity]);
+  }, [intensity, dropSize]);
 
   return (
     <>
@@ -578,6 +748,40 @@ export default function RainScene3D({ mode = 'background' }) {
                       borderRadius: 6,
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Droplet Size Selector (Single Big Drops) */}
+            <div>
+              <div style={{ fontSize: 10, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 5 }}>
+                Droplet Size (Single Drops)
+              </div>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {[
+                  { id: 'standard', label: 'Normal' },
+                  { id: 'large', label: 'Big Drops' },
+                  { id: 'huge', label: 'Huge Drops 💧' },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setDropSize(item.id)}
+                    style={{
+                      flex: 1,
+                      background: dropSize === item.id ? 'rgba(56, 189, 248, 0.28)' : 'rgba(255, 255, 255, 0.05)',
+                      border: dropSize === item.id ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
+                      color: dropSize === item.id ? '#38bdf8' : '#94a3b8',
+                      fontSize: 10.5,
+                      fontWeight: dropSize === item.id ? 700 : 500,
+                      padding: '5px 4px',
+                      borderRadius: 6,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {item.label}
