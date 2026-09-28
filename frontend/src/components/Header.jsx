@@ -31,7 +31,7 @@ export default function Header({
         <Logo size={24} />
         <div>
           <div className="brand-title">A.A.R.A.M.B.H</div>
-          <div className="brand-sub">{t.subtitle}</div>
+          <div className="brand-sub" title={t.subtitle}>Storm Operations · 0–6h Nowcast</div>
         </div>
       </div>
 
