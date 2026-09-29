@@ -94,8 +94,8 @@ python3 run_case_studies.py               # ~2 s; writes results.json,
 
 ## Five-minute judge demo
 
-1. **Start it** — `docker compose up --build`; open http://localhost:8080.
-   India fills the map (Bhuvan base-map toggle); the region picker lists the
+1. **Start it** — `docker compose up --build` (or run local backend + frontend); open http://localhost:8080 (or http://localhost:5173).
+   India fills the map with high-performance Dark Canvas / Topo Relief / Satellite basemaps; the region picker lists the
    8 metros; the clock and countdowns run on IST.
 2. **Pick Delhi-NCR.** Hazard polygons appear with IMD colour codes
    (yellow/orange/red). Click one: English + Hindi advisory referencing DDMA,
@@ -119,6 +119,14 @@ python3 run_case_studies.py               # ~2 s; writes results.json,
 7. **Switch to Relocation Planning Mode.** Click **"Relocation Planning →"** in the top navigation bar or from the landing page. The AI-GIS disaster relocation cockpit opens with spatial multi-hazard footprints, vulnerable habitations, and candidate relief camps.
 8. **Trigger "RUN ANALYTICS ENGINE".** Click the blue **RUN ANALYTICS ENGINE** button: the backend intersects spatial hazard layers with demographic vulnerability (elderly %, disabled %, Kutcha housing, low income), computing priority scores and allocating residents to safe camps without exceeding carrying capacity.
 9. **Explainable AI (XAI) & Statutory Legal Certificate.** Click on an Immediate Phase red zone to view the transparent XAI justification. Click **"Download Legal Certificate (PDF)"**: a dynamically generated, tamper-evident directive is downloaded with a cryptographic SHA-256 blockchain audit hash.
+
+## GIS Basemap Infrastructure
+
+All interactive map visualizers across the platform (**Landing Hero**, **Regional Coverage**, **Live Convective Nowcast**, and **Relocation & Carrying Capacity Dashboard**) utilize resilient, high-speed, zero-dependency CDN tile layers:
+- **Esri Dark Canvas (GIS)**: Default operations mode combining `World_Dark_Gray_Base` and high-contrast `World_Dark_Gray_Reference` overlay for crisp radar hazard contrast.
+- **Physical Topography & Relief**: Full elevation, mountain ranges, and hydrological contours via `World_Topo_Map`.
+- **Orbital Earth Observation (Satellite)**: High-resolution satellite imagery via `World_Imagery` with boundary and place references.
+- **CartoDB Dark Matter & Voyager**: Ultra-fast vector-rendered alternatives for both dark operations and street-level navigation.
 
 ## Data sources — India first
 

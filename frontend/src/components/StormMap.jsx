@@ -218,25 +218,35 @@ export default function StormMap({
         {toggles.bhuvan ? (
           <>
             <TileLayer
-              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              opacity={0.55}
+              key="sat-base"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              attribution="ISRO Bhuvan / Esri Satellite"
+              maxZoom={19}
             />
-            <WMSTileLayer
-              url="https://bhuvan-vec2.nrsc.gov.in/bhuvan/wms"
-              layers={bhuvanLayers}
-              format="image/png"
-              transparent={false}
-              version="1.1.1"
-              opacity={0.95}
-              attribution="ISRO Bhuvan (NRSC)"
+            <TileLayer
+              key="sat-ref"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+              zIndex={5}
+              opacity={0.85}
+              maxZoom={19}
             />
           </>
         ) : (
-          <TileLayer
-            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
+          <>
+            <TileLayer
+              key="storm-dark-base"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+              attribution="&copy; Esri &mdash; Dark Canvas GIS"
+              maxZoom={16}
+            />
+            <TileLayer
+              key="storm-dark-ref"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+              zIndex={5}
+              opacity={0.78}
+              maxZoom={16}
+            />
+          </>
         )}
 
         {toggles.radar && radarUrl && radar?.bounds && (

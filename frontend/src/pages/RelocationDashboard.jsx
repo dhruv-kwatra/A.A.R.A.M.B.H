@@ -27,49 +27,50 @@ const PHASE_COLORS = {
 };
 
 // 100% Free Open Source Basemap Presets (No API Keys, No Watermarks)
+// 100% Free High-Performance Basemap Presets
 const BASEMAP_PRESETS = {
-  gebco: {
-    id: 'gebco',
-    name: 'GEBCO Physical Relief (Topography)',
-    wms: true,
-    url: 'https://wms.gebco.net/mapserv?',
-    layers: 'GEBCO_LATEST',
-    attribution: '&copy; GEBCO / NOAA / IHO / IOC',
-    refUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
-    maxZoom: 16,
-  },
-  osm_dark: {
-    id: 'osm_dark',
-    name: 'OpenStreetMap Dark (Free OSS)',
-    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors',
-    className: 'reloc-osm-dark-tiles',
-    maxZoom: 19,
-  },
   esri_dark: {
     id: 'esri_dark',
     name: 'Esri Dark Canvas (GIS)',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+    attribution: 'Tiles &copy; Esri &mdash; Dark Canvas GIS',
     refUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
     className: '',
     maxZoom: 16,
   },
-  osm_standard: {
-    id: 'osm_standard',
-    name: 'OpenStreetMap Standard (Light)',
-    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors',
-    className: '',
-    maxZoom: 19,
+  topo: {
+    id: 'topo',
+    name: 'Physical Topography & Relief',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Topographic Relief',
+    maxZoom: 18,
   },
-  opentopo: {
-    id: 'opentopo',
-    name: 'OpenTopoMap (Topography)',
-    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> | &copy; <a href="https://opentopomap.org" target="_blank" rel="noreferrer">OpenTopoMap</a>',
+  carto_dark: {
+    id: 'carto_dark',
+    name: 'CartoDB Dark Matter',
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    subdomains: 'abcd',
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
     className: '',
-    maxZoom: 17,
+    maxZoom: 20,
+  },
+  satellite: {
+    id: 'satellite',
+    name: 'Esri Satellite Imagery',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; High-Res Satellite',
+    refUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    className: '',
+    maxZoom: 18,
+  },
+  voyager: {
+    id: 'voyager',
+    name: 'CartoDB Voyager (Streets)',
+    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    subdomains: 'abcd',
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+    className: '',
+    maxZoom: 20,
   },
 };
 
@@ -85,8 +86,8 @@ export default function RelocationDashboard({ lang = 'en', onLang, theme = 'dark
   const [citizenMessage, setCitizenMessage] = useState('');
   const [feedbackStatus, setFeedbackStatus] = useState(null);
   const [toast, setToast] = useState(null);
-  const [basemapKey, setBasemapKey] = useState('osm_dark');
-  const activeBasemap = BASEMAP_PRESETS[basemapKey] || BASEMAP_PRESETS.osm_dark;
+  const [basemapKey, setBasemapKey] = useState('esri_dark');
+  const activeBasemap = BASEMAP_PRESETS[basemapKey] || BASEMAP_PRESETS.esri_dark;
   const [mobileTab, setMobileTab] = useState('map');
   const mapRef = useRef(null);
 
@@ -522,11 +523,11 @@ export default function RelocationDashboard({ lang = 'en', onLang, theme = 'dark
                 onChange={(e) => setBasemapKey(e.target.value)}
                 aria-label="Free Basemap Provider"
               >
-                <option value="gebco">GEBCO Relief (Physical Topography)</option>
-                <option value="osm_dark">OpenStreetMap Dark (Free OSS)</option>
                 <option value="esri_dark">Esri Dark Canvas (GIS)</option>
-                <option value="osm_standard">OpenStreetMap Standard</option>
-                <option value="opentopo">OpenTopoMap (Topography)</option>
+                <option value="topo">Physical Topography &amp; Relief</option>
+                <option value="carto_dark">CartoDB Dark Matter</option>
+                <option value="satellite">Esri Satellite Imagery</option>
+                <option value="voyager">CartoDB Voyager (Streets)</option>
               </select>
               <span className="reloc-oss-badge">FREE OSS</span>
             </div>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   MapContainer,
   TileLayer,
-  WMSTileLayer,
   CircleMarker,
   Circle,
   Tooltip as LeafletTooltip,
@@ -29,7 +28,7 @@ export default function CoverageLeafletMap({
   hoveredId = null,
   onSelectRegion,
 }) {
-  const [basemap, setBasemap] = useState('gebco'); // 'gebco' | 'osm_dark'
+  const [basemap, setBasemap] = useState('dark'); // 'dark' | 'relief' | 'satellite'
   const metroList = regions && regions.length > 0 ? regions : REGIONS_FALLBACK;
 
   const handleMetroClick = (regionId) => {
@@ -51,25 +50,33 @@ export default function CoverageLeafletMap({
       <div className="coverage-map-head">
         <div className="coverage-map-title">
           <span className="cov-pulse-dot" />
-          <span className="cov-badge">GEBCO Physical Relief WMS</span>
+          <span className="cov-badge">Interactive GIS Coverage</span>
           <span className="cov-sub">8 Convective Radar Domains</span>
         </div>
         <div className="coverage-map-actions">
           <button
             type="button"
-            className={`cov-btn ${basemap === 'gebco' ? 'active' : ''}`}
-            onClick={() => setBasemap('gebco')}
-            title="GEBCO Global Elevation & Ocean Bathymetry"
+            className={`cov-btn ${basemap === 'dark' || basemap === 'osm_dark' ? 'active' : ''}`}
+            onClick={() => setBasemap('dark')}
+            title="Esri Dark Canvas GIS"
           >
-            🏔️ Relief
+            🌌 Dark GIS
           </button>
           <button
             type="button"
-            className={`cov-btn ${basemap === 'osm_dark' ? 'active' : ''}`}
-            onClick={() => setBasemap('osm_dark')}
-            title="OpenStreetMap Dark GIS"
+            className={`cov-btn ${basemap === 'relief' || basemap === 'gebco' ? 'active' : ''}`}
+            onClick={() => setBasemap('relief')}
+            title="Physical Topographic & Mountain Relief"
           >
-            🌃 Dark OSS
+            🏔️ Topo Relief
+          </button>
+          <button
+            type="button"
+            className={`cov-btn ${basemap === 'satellite' ? 'active' : ''}`}
+            onClick={() => setBasemap('satellite')}
+            title="Satellite Imagery"
+          >
+            🛰️ Satellite
           </button>
         </div>
       </div>
@@ -85,30 +92,47 @@ export default function CoverageLeafletMap({
           attributionControl={false}
           className="coverage-map-leaflet"
         >
-          {basemap === 'gebco' ? (
+          {basemap === 'relief' || basemap === 'gebco' ? (
+            <TileLayer
+              key="cov-relief"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+              attribution="&copy; Esri World Topography"
+              maxZoom={18}
+            />
+          ) : basemap === 'satellite' ? (
             <>
-              {/* GEBCO Global Ocean Bathymetry & Land Topographic Relief (WMS) */}
-              <WMSTileLayer
-                url="https://wms.gebco.net/mapserv?"
-                layers="GEBCO_LATEST"
-                format="image/png"
-                transparent={false}
-                attribution="&copy; GEBCO / NOAA / IHO / IOC"
-              />
-              {/* Reference Boundaries & City Labels */}
               <TileLayer
-                url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+                key="cov-sat-base"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                attribution="&copy; Esri Satellite"
+                maxZoom={18}
+              />
+              <TileLayer
+                key="cov-sat-ref"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
                 zIndex={5}
-                opacity={0.88}
+                opacity={0.85}
+                maxZoom={18}
               />
             </>
           ) : (
-            <TileLayer
-              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              className="reloc-osm-dark-tiles"
-              maxZoom={19}
-            />
+            <>
+              {/* Esri Dark Canvas Base */}
+              <TileLayer
+                key="cov-dark-base"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+                attribution="&copy; Esri Dark Canvas GIS"
+                maxZoom={16}
+              />
+              {/* Reference Boundaries & City Labels */}
+              <TileLayer
+                key="cov-dark-ref"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+                zIndex={5}
+                opacity={0.88}
+                maxZoom={16}
+              />
+            </>
           )}
 
           {/* 8 Indian Convective Radar Windows */}

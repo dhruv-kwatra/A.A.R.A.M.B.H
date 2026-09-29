@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   MapContainer,
   TileLayer,
-  WMSTileLayer,
   CircleMarker,
   Circle,
   Tooltip as LeafletTooltip,
@@ -17,7 +16,7 @@ import { go } from '../../router.js';
  * centered over the Indian subcontinent with interactive radar beacons for the 8 metro regions.
  */
 export default function HeroLeafletMap({ regions = REGIONS_FALLBACK, worstSev = 'yellow' }) {
-  const [basemap, setBasemap] = useState('gebco'); // 'gebco' | 'osm_dark'
+  const [basemap, setBasemap] = useState('dark'); // 'dark' | 'relief' | 'satellite'
 
   const metroList = regions && regions.length > 0 ? regions : REGIONS_FALLBACK;
 
@@ -42,30 +41,47 @@ export default function HeroLeafletMap({ regions = REGIONS_FALLBACK, worstSev = 
         className="hero-leaflet-container"
       >
         {/* Basemap Selection */}
-        {basemap === 'gebco' ? (
+        {basemap === 'relief' || basemap === 'gebco' ? (
+          <TileLayer
+            key="relief"
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+            attribution="&copy; Esri &mdash; World Topography &amp; Relief"
+            maxZoom={18}
+          />
+        ) : basemap === 'satellite' ? (
           <>
-            {/* GEBCO Global Ocean Bathymetry & Land Topographic Relief (WMS) */}
-            <WMSTileLayer
-              url="https://wms.gebco.net/mapserv?"
-              layers="GEBCO_LATEST"
-              format="image/png"
-              transparent={false}
-              attribution="&copy; GEBCO / NOAA / IHO / IOC"
-            />
-            {/* Reference Overlay: Country boundaries, coastlines, and place labels */}
             <TileLayer
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+              key="sat-base"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              attribution="&copy; Esri World Imagery"
+              maxZoom={18}
+            />
+            <TileLayer
+              key="sat-ref"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
               zIndex={5}
-              opacity={0.88}
+              opacity={0.85}
+              maxZoom={18}
             />
           </>
         ) : (
-          <TileLayer
-            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            className="reloc-osm-dark-tiles"
-            maxZoom={19}
-          />
+          <>
+            {/* Esri Dark Canvas Base (Continents, oceans, terrain) */}
+            <TileLayer
+              key="dark-base"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+              attribution="&copy; Esri &mdash; Dark Canvas GIS"
+              maxZoom={16}
+            />
+            {/* Reference Overlay: Country boundaries, coastlines, and place labels */}
+            <TileLayer
+              key="dark-ref"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+              zIndex={5}
+              opacity={0.88}
+              maxZoom={16}
+            />
+          </>
         )}
 
         {/* 8 Indian Metro Convective Nowcast Beacons */}
@@ -134,18 +150,28 @@ export default function HeroLeafletMap({ regions = REGIONS_FALLBACK, worstSev = 
       {/* Floating Basemap Style Switcher */}
       <div className="hero-map-basemap-toggle">
         <button
-          className={`hero-map-btn ${basemap === 'gebco' ? 'active' : ''}`}
-          onClick={() => setBasemap('gebco')}
-          title="GEBCO Ocean Bathymetry & Topographic Relief"
+          type="button"
+          className={`hero-map-btn ${basemap === 'dark' || basemap === 'osm_dark' ? 'active' : ''}`}
+          onClick={() => setBasemap('dark')}
+          title="Esri Dark Canvas GIS"
         >
-          🏔️ GEBCO Relief
+          🌌 Dark GIS
         </button>
         <button
-          className={`hero-map-btn ${basemap === 'osm_dark' ? 'active' : ''}`}
-          onClick={() => setBasemap('osm_dark')}
-          title="OpenStreetMap Dark GIS"
+          type="button"
+          className={`hero-map-btn ${basemap === 'relief' || basemap === 'gebco' ? 'active' : ''}`}
+          onClick={() => setBasemap('relief')}
+          title="Physical Topographic & Mountain Relief"
         >
-          🌃 Dark OSS
+          🏔️ Topo Relief
+        </button>
+        <button
+          type="button"
+          className={`hero-map-btn ${basemap === 'satellite' ? 'active' : ''}`}
+          onClick={() => setBasemap('satellite')}
+          title="High-Resolution Satellite Imagery"
+        >
+          🛰️ Satellite
         </button>
       </div>
     </div>
